@@ -414,3 +414,17 @@ The long-term network is:
 ```text
 A decentralized coordination protocol where service providers, customers, developers, and other workers can discover each other, coordinate work, and build portable reputation from verifiable evidence.
 ```
+
+---
+
+## Network Readiness in the Chatbot (2026-10)
+
+The chatbot repository now carries the concrete design for this bridge in `alkaest-chatbot/docs/NETWORK_READINESS.md`:
+
+- domain facts recorded as append-only, signed events (Space = establishment, Object = appointment, Event, Evidence);
+- an Ed25519 key pair per establishment node from install time;
+- pseudonymous customer identifiers outside the establishment;
+- two-sided reputation: customers rate providers after completed appointments (delay configurable per establishment), and customer reliability is derived from outcomes.
+
+These choices keep the protocol generic: nothing in them is specific to WhatsApp, Google Calendar or barbershops.
+
