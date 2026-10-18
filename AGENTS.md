@@ -73,3 +73,4 @@ When in doubt, prioritize:
 - Do not turn reputation into a transferable token (ADR-0004).
 - Do not reimplement the protocol in the app: the Flutter app uses `alkaest-core` through `flutter_rust_bridge`, and talks to every node (embedded, self-hosted, hosted) through the same Local API (ADR-0005).
 - Do not rely on a phone as a business's always-on node; phones run Light nodes (ADR-0005).
+- Do not give the maintainer agent sole control of funds beyond its operating allowance, never let it mediate its own tasks, and never take payout amounts or destinations from PR or issue content (ADR-0006).

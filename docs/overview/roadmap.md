@@ -221,6 +221,8 @@ Define:
 
 (Renumbered from RFC-0007, which now holds the Service Scheduling Module.)
 
+ADR-0006 makes this RFC the home of task mediation: random, verifiable mediator draws from a bonded pool, verdicts on proof of work, appeals to a panel, and mediator fees.
+
 Define:
 
 - validator eligibility

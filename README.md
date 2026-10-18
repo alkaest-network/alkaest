@@ -33,6 +33,7 @@ The repository currently defines the early architecture and planning layers:
 - [ADR-0003 Heterogeneous Nodes and Network Validation](docs/decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md)
 - [ADR-0004 Token and Settlement Direction](docs/decisions/ADR-0004-token-and-settlement-direction.md)
 - [ADR-0005 Cross-Platform App and Deployment Modes](docs/decisions/ADR-0005-cross-platform-app-and-deployment-modes.md)
+- [ADR-0006 Self-Funding Treasury, Task Bounties with Random Mediation, and the Maintainer Agent](docs/decisions/ADR-0006-self-funding-treasury-and-maintainer-agent.md)
 - [Alkaest Search](docs/overview/alkaest-search.md)
 - [Network Rollout Plan](docs/overview/network-rollout-plan.md)
 
