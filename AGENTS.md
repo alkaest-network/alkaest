@@ -9,7 +9,7 @@ Desktop-first MVP for open-source development coordination.
 The first implementation is a desktop Standard node, but the architecture must support heterogeneous nodes (phones, weak machines, servers) from the start (ADR-0003, RFC-0002 §16).
 
 Alkaest Chatbot is the commercial bootstrap path for near-term revenue and service-domain learning.
-Keep chatbot-specific operational details out of the protocol core unless a future RFC explicitly defines a service scheduling module.
+Keep chatbot-specific operational details out of the protocol core. Service scheduling is a module (RFC-0007), not core: channel details (WhatsApp, aliases, message wording) and calendar sync stay in integrations.
 
 ## Primary goals
 1. Finish protocol specifications before implementation.

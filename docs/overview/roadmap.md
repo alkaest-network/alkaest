@@ -217,7 +217,9 @@ Define:
 - negative signals
 - anti-farming rules
 
-#### RFC-0007: Validation and Dispute Resolution
+#### RFC-0013: Validation and Dispute Resolution
+
+(Renumbered from RFC-0007, which now holds the Service Scheduling Module.)
 
 Define:
 
