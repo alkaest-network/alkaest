@@ -38,10 +38,12 @@ Tasks are protocol records, so their whole life is a signed, replayable log. Tha
 
 ### 2. Payment is held in escrow and released by a random mediator
 
-When a task is accepted by a worker, the protocol draws a **mediator**:
+The model follows Bisq 2: every movement of value is a protocol multisig between **the two parties involved and one mediator**. There is no separate backup-key holder.
+
+When a task is accepted by a worker, the protocol draws a **mediator**. The draw happens at claim time, before funding, because the mediator's key is part of the escrow:
 
 * **Eligible:**
-  * the identity advertises the mediator role for that domain;
+  * the identity runs a **mediator node with a local AI** (§2.1) and advertises the mediator role for that domain;
   * it has posted a **bond**;
   * its domain reputation (RFC-0006) is above the minimum;
   * it has no conflict of interest: it is not the creator or the worker, is not linked to either, and has not mediated the same pair recently.
@@ -52,12 +54,36 @@ When a task is accepted by a worker, the protocol draws a **mediator**:
   * if that mediator does not accept in time, the next ticket is asked.
 
   Any node can recompute the draw.
-* **The mediator's job:** check the proof of work (the PR, files or other deliverable) against the acceptance criteria. The verdict is approve, request changes, or reject, and it is a signed event.
-
 For crypto payment methods, the money sits in an escrow **before work starts**, so the worker knows it exists. The escrow is a **2-of-3 multisig: creator, worker, mediator**.
-* **Approve:** the mediator and the worker release it to the worker.
-* **Reject:** the mediator and the creator refund it.
-* **Mediator unavailable:** the creator and the worker can always settle between themselves without the mediator.
+
+**When both parties agree, the mediator is not needed.** The worker delivers, the creator accepts, and both sign the release. The mediator's AI only checks that both approvals exist, records an automatic confirmation, and needs no human time. In this case, no mediator fee is charged (§4).
+
+**When they disagree, the mediator conciliates.** This happens if the creator does not accept the delivery, or the worker does not accept a refund or a partial payment. The steps:
+
+1. **AI pre-analysis.** The mediator node's local AI compares the proof of work (the PR, files or other deliverable) with the acceptance criteria. For code, it also reads the CI results. It writes a signed pre-analysis report that both parties can see.
+2. **Conciliation proposal.** Based on that report, the mediator proposes a payout: full, partial or refund. If both parties accept, they sign it themselves and the case closes.
+3. **Verdict.** If conciliation fails, the human mediator decides: approve, request changes, or reject. The decision is a signed event, and it comes with **proof of reading** (§2.1). The mediator then signs the release with the side the verdict favors:
+   * **Approve:** the mediator and the worker release the money to the worker.
+   * **Reject:** the mediator and the creator refund it.
+4. **Mediator unavailable.** The creator and the worker can always settle between themselves without the mediator.
+
+#### 2.1 Mediator nodes: local AI first, human sign-off always
+
+To be eligible, a mediator must:
+
+* run a node with a **local AI** that analyses its cases. It does not have to be a cloud service: the same node software and brain (`alkaest-brain`) can run on the mediator's own machine;
+* **pre-analyse every case**, and attach the signed AI report to the verdict;
+* **approve every disputed verdict manually**, with proof of reading.
+
+**What the protocol can verify, and what it cannot:**
+
+* **Which model ran:** the protocol cannot prove it. What it requires is the signed pre-analysis report attached to every verdict. A mediator whose reports are empty or contradict the verdict loses appeals, bonds and reputation.
+* **That a human read the case:** the protocol cannot prove it either. It makes rubber-stamping costly instead:
+  * a **comprehension check**: the AI generates questions specific to the case, for example "which acceptance criterion does the second commit address?", and the mediator answers them inside the signed verdict;
+  * a **reasoned verdict** that cites the acceptance criteria and the evidence;
+  * **appeals** that can overturn the verdict and forfeit the bond.
+
+The AI prepares, the human decides. In the cooperative case, the AI's automatic confirmation is enough because both parties already signed.
 
 For **fiat payment methods** (PIX, bank transfer), the money cannot be escrowed. As in Bisq, both sides post a **security deposit in BTC** into the escrow, and the mediator's verdict decides which deposit is forfeited.
 
@@ -78,8 +104,8 @@ Converting to fiat outside the protocol is done in Bisq.
 
 Every task pays, on top of the bounty:
 
-* the **mediator fee**, a published percentage (for example 3%), paid only for a verdict;
-* the **Alkaest maintenance share**, a small published percentage (for example 0.5%), sent to the treasury.
+* the **mediator fee**, a published percentage (proposed default 3%), paid only when there is a dispute. A cooperative close costs nothing beyond the maintenance share. In a dispute, the fee comes out of the escrow and the verdict decides which side bears it;
+* the **Alkaest maintenance share**, a small published percentage (proposed default 0.5%), sent to the treasury on every closed task.
 
 Both are outputs of the escrow's release and refund transactions, built by every client. An open protocol cannot force a fee, because a fork can drop it, so the share stays small enough to be worth paying. Bisq makes the same bargain with its trade fees.
 
@@ -106,11 +132,11 @@ What the agent does from day one:
 
 | Wallet | Holds | Control |
 |---|---|---|
-| **Reserve** | Most funds | 2-of-3 multisig: maintainer (hardware wallet), offline backup, agent. The agent cannot spend alone |
+| **Reserve** | Most funds | 2-of-3 multisig: maintainer (hardware wallet), agent, and a **mediator drawn for the reserve** (§2), redrawn every budget period by moving funds to a new address. The mediator co-signs only refills that match the published budget policy. Neither the agent nor the maintainer can spend alone |
 | **Operating allowance** | One budget period of spending, for example a quarter | Agent alone, within the budget policy |
 | **Task escrows** | Each funded task | 2-of-3 creator (agent) / worker / mediator |
 
-Human intervention is reduced to **refilling the operating allowance once per period** and **changing the budget policy**. The worst case of an agent fully compromised is losing one allowance. The reserve is never at risk.
+Human intervention is reduced to **refilling the operating allowance once per period** and **changing the budget policy**. The worst case of an agent fully compromised is losing one allowance. The reserve cannot move without the maintainer or the reserve's mediator.
 
 The agent never approves its own payments, because random mediators do. That is what lets it run with minimal intervention.
 
@@ -141,6 +167,13 @@ The policy is a signed object in the `alkaest-network` space. The agent reads it
 * **Prompt injection.** Everything the agent reads can be attacker-controlled: issues, PRs, deliverables and comments. The agent's only spending power is the operating allowance, capped by policy. Amounts are fixed when a task is funded. Payout destinations come from the worker's signed claim, never from content. Release needs a mediator who is not the agent.
 * **Sybil mediators.** An attacker who creates many identities to get drawn for their own task is stopped by three things: bonds, minimum reputation, conflict-of-interest exclusion and per-draw weighting. The bond is forfeited when an appeal overturns a verdict.
 * **Collusion between mediator and worker** is limited by the random draw, bonds, appeals and reputation loss. For large tasks, a panel of three mediators can be required from the start.
+* **Collusion between the reserve's mediator and the agent** could move the reserve without the maintainer. Three measures limit it:
+  * the reserve's mediator must post a bond proportional to the reserve;
+  * it is redrawn every budget period;
+  * the maintainer watches the reserve address (the node alerts on any spend).
+
+  Until the mediator pool is large and bonded (phase C), keep the reserve small and refill from donations directly.
+* **Rubber-stamping mediators** who approve without reading are deterred by comprehension checks, reasoned verdicts and appeals that forfeit bonds (§2.1). None of these is a proof, which is why appeals exist.
 * **Randomness bias.** The seed uses a future Bitcoin block hash. A miner could bias the draw only by throwing away valid blocks, which costs far more than a typical task. For very large tasks, the seed can combine several blocks.
 * **Untrusted deliverables.** Code from tasks runs only in isolated CI or throwaway VMs, never on the machine that holds the agent's or the reserve's keys.
 * **Least privilege for the agent.** GitHub tokens are limited to issues and comments, with no merge rights. The network reaches only GitHub and its own Bitcoin and Lightning nodes. Every action is a signed event or a public comment.
@@ -191,14 +224,14 @@ This is not legal advice. Get it, and talk to an accountant, before phase B.
    * RFC-0003 updates: task offer fields, payout destination in the claim, needs board, budget policy.
 2. **Agent, phase A, planning only:** the needs board with priorities and price estimates, published from the `alkaest-network` space. It needs no money and can run on day zero.
 3. **Treasury service in `alkaest-node`** (Rust, BDK): reserve and allowance wallets, escrow creation and release, on `regtest`.
-4. **Mediator draw and verdict flow** in the node. The app gets screens for mediators (review the deliverable, sign the verdict) and for workers (claim, deliver, receive).
+4. **Mediator draw, cooperative close, AI pre-analysis, conciliation and verdict flow** in the node. The mediator node reuses `alkaest-brain` for the pre-analysis. The app gets screens for mediators (review the deliverable, sign the verdict) and for workers (claim, deliver, receive).
 5. **Phase B, after the legal check:** mainnet, donation addresses, published policy, and the first mediator pool.
 
 ---
 
 ## Open Questions
 
-* Who holds the reserve's offline backup key.
-* Default fee percentages for the mediator and the maintenance share.
-* Bond sizes and the minimum reputation for mediators in each domain.
+* Confirm the proposed defaults: mediator fee 3% (disputes only), maintenance share 0.5%.
+* Bond sizes and the minimum reputation for mediators in each domain, including the reserve's mediator.
+* The minimum model and hardware a mediator node must run for its AI pre-analysis.
 * Which fiat methods to support first, and whether at all before phase C.
