@@ -28,6 +28,10 @@ The repository currently defines the early architecture and planning layers:
 - [Chatbot-to-Network Diagram](docs/diagrams/chatbot-to-network.md)
 - [RFC-0001 Protocol Core](docs/rfc/0001-protocol-core.md)
 - [RFC-0002 Node Architecture](docs/rfc/0002-node-architecture.md)
+- [ADR-0003 Heterogeneous Nodes and Network Validation](docs/decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md)
+- [ADR-0004 Token and Settlement Direction](docs/decisions/ADR-0004-token-and-settlement-direction.md)
+- [Alkaest Search](docs/overview/alkaest-search.md)
+- [Network Rollout Plan](docs/overview/network-rollout-plan.md)
 
 ## Commercial bootstrap path
 

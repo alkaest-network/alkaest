@@ -138,6 +138,8 @@ The project still needs a more explicit treatment of:
 
 ### 9. Future node profiles
 
+> Update 2026-10-18: node profiles (Light, Standard, Service) are now an architectural requirement; see ADR-0003 and RFC-0002 §16. The rollout from one local node to a global testnet is in `network-rollout-plan.md`.
+
 The MVP is full-node-first, but the longer-term architecture still needs a place for:
 
 - light clients

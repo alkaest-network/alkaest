@@ -6,7 +6,7 @@ This repository contains protocol specifications, RFCs, diagrams, and future imp
 
 ## Current phase
 Desktop-first MVP for open-source development coordination.
-Do not optimize for mobile-first or light-client-first unless an RFC explicitly requires it.
+The first implementation is a desktop Standard node, but the architecture must support heterogeneous nodes (phones, weak machines, servers) from the start (ADR-0003, RFC-0002 §16).
 
 Alkaest Chatbot is the commercial bootstrap path for near-term revenue and service-domain learning.
 Keep chatbot-specific operational details out of the protocol core unless a future RFC explicitly defines a service scheduling module.
@@ -68,3 +68,6 @@ When in doubt, prioritize:
 - Do not make the protocol WhatsApp-specific, Google Calendar-specific, or scheduling-only.
 - Do not assume centralized operators.
 - Do not introduce marketplace/mobile complexity into the MVP unless explicitly asked.
+- Do not assume every node is a desktop full node or that big nodes are trusted more (ADR-0003).
+- Do not build a blockchain for validation; signed, replayable space logs are validated by every node (ADR-0003).
+- Do not turn reputation into a transferable token (ADR-0004).
