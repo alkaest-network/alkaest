@@ -28,6 +28,7 @@ The repository currently defines the early architecture and planning layers:
 - [Chatbot-to-Network Diagram](docs/diagrams/chatbot-to-network.md)
 - [RFC-0001 Protocol Core](docs/rfc/0001-protocol-core.md)
 - [RFC-0002 Node Architecture](docs/rfc/0002-node-architecture.md)
+- [RFC-0009 Node API and SDK Contract (draft)](docs/rfc/0009-node-api-and-sdk-contract.md)
 - [ADR-0003 Heterogeneous Nodes and Network Validation](docs/decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md)
 - [ADR-0004 Token and Settlement Direction](docs/decisions/ADR-0004-token-and-settlement-direction.md)
 - [ADR-0005 Cross-Platform App and Deployment Modes](docs/decisions/ADR-0005-cross-platform-app-and-deployment-modes.md)

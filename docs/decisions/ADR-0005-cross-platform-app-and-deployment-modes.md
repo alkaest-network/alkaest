@@ -94,7 +94,7 @@ ADR-0001 keeps the MVP desktop-first and free of light-client requirements. This
 
 ## Implementation Order
 
-1. **Local API** in `alkaest-node`: HTTP and WebSocket, with requests authenticated by signature, plus device pairing.
+1. **Local API** in `alkaest-node`: HTTP with a server-sent event stream, requests authenticated by signature, and device pairing (RFC-0009).
 2. **Flutter app, connect mode**: agenda, services, configurable messages and the chatbot conversation, against a self-hosted node.
 3. **Scheduling module**: write the service scheduling module RFC (required by AGENTS.md before scheduling enters the protocol), then move Alkaest Chatbot's booking rules into that module, so hosted, self-hosted and embedded behave identically.
 4. **Embedded mode**: `alkaest-core` inside the app through `flutter_rust_bridge`; a Light node on phones and a Standard node on desktops.
