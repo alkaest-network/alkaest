@@ -71,3 +71,5 @@ When in doubt, prioritize:
 - Do not assume every node is a desktop full node or that big nodes are trusted more (ADR-0003).
 - Do not build a blockchain for validation; signed, replayable space logs are validated by every node (ADR-0003).
 - Do not turn reputation into a transferable token (ADR-0004).
+- Do not reimplement the protocol in the app: the Flutter app uses `alkaest-core` through `flutter_rust_bridge`, and talks to every node (embedded, self-hosted, hosted) through the same Local API (ADR-0005).
+- Do not rely on a phone as a business's always-on node; phones run Light nodes (ADR-0005).

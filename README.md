@@ -30,6 +30,7 @@ The repository currently defines the early architecture and planning layers:
 - [RFC-0002 Node Architecture](docs/rfc/0002-node-architecture.md)
 - [ADR-0003 Heterogeneous Nodes and Network Validation](docs/decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md)
 - [ADR-0004 Token and Settlement Direction](docs/decisions/ADR-0004-token-and-settlement-direction.md)
+- [ADR-0005 Cross-Platform App and Deployment Modes](docs/decisions/ADR-0005-cross-platform-app-and-deployment-modes.md)
 - [Alkaest Search](docs/overview/alkaest-search.md)
 - [Network Rollout Plan](docs/overview/network-rollout-plan.md)
 
