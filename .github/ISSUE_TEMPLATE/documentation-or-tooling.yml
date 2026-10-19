@@ -1,0 +1,25 @@
+name: Documentation or tooling issue
+description: Report a broken link, inaccurate project status, or issue with a repository script.
+title: "Docs/tooling: "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: File or location
+      description: Link to the file, section, or command involved.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the incorrect or confusing behavior and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Reproduction or suggested correction
+      description: For tooling, provide the command and relevant error with secrets removed. For docs, suggest a correction if you have one.
+    validations:
+      required: false

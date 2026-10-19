@@ -152,10 +152,10 @@ Rejected because it expands scope without first proving the core workflow on a s
 
 This decision supports:
 
-* [RFC-0001 Protocol Core](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0001-protocol-core.md)
-* [RFC-0002 Node Architecture](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0002-node-architecture.md)
-* [RFC-0003 Development Workflow Module](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0003-development-workflow-module.md)
-* [RFC-0004 Envelope, Canonical Encoding, and Object IDs](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0004-envelope-canonical-encoding-and-object-ids.md)
+* [RFC-0001 Protocol Core](../rfc/0001-protocol-core.md)
+* [RFC-0002 Node Architecture](../rfc/0002-node-architecture.md)
+* [RFC-0003 Development Workflow Module](../rfc/0003-development-workflow-module.md)
+* [RFC-0004 Envelope, Canonical Encoding, and Object IDs](../rfc/0004-envelope-canonical-encoding-and-object-ids.md)
 
 This ADR should be treated as a product-direction constraint when writing future RFCs.
 

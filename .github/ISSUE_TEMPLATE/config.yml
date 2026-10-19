@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contributor guide
+    url: https://github.com/alkaest-network/alkaest/blob/main/CONTRIBUTING.md
+    about: Review repository scope, component access, and contribution steps.
+  - name: Security vulnerability report
+    url: https://github.com/alkaest-network/alkaest/security/advisories/new
+    about: Use private reporting if enabled. Do not post exploit details in a public issue.
