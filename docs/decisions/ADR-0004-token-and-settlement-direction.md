@@ -23,7 +23,7 @@ Alkaest has three distinct things that are easy to conflate:
 
 | Option | What it means | Pros | Cons |
 |---|---|---|---|
-| A. No token | Reputation is non-transferable; payments happen outside the protocol (cash, PIX, card) | Simplest; no regulatory exposure; no speculation | No native escrow or node incentives |
+| A. No token | Reputation is non-transferable; payments happen outside the protocol (cash, PIX, card) | Simplest; avoids issuing a protocol token; no token speculation | No native escrow or node incentives; other legal obligations may still apply |
 | B. Bitcoin as the settlement layer | Payments and escrow in BTC (Lightning for small amounts, 2-of-3 multisig escrow for disputes), like Bisq | No token to launch or defend; censorship-resistant; proven model (Bisq) | BTC volatility for service prices; Lightning UX on phones |
 | C. Asset on Bitcoin for governance (BSQ-like) | A colored asset issued on Bitcoin (Taproot Assets or RGB) to reward contributors and service nodes and to vote | Mirrors Bisq's DAO; stays in the Bitcoin security model | Tooling still maturing; legal analysis needed before any distribution |
 | D. Token on a smart-contract chain | ERC-20 on an Ethereum L2 (or Solana SPL) | Rich tooling and liquidity | Pulls the network toward a chain's governance and sequencers; strongest regulatory exposure if sold; speculation |
@@ -43,12 +43,12 @@ Alkaest has three distinct things that are easy to conflate:
 
 ## Legal Note
 
-Decentralising the network changes who controls data and funds; it does not take a project outside the law. Bisq stays operable because it never holds users' data or money, not because laws do not apply to it.
+Decentralising the network changes who controls data and funds; it does not take a project outside the law. Legal obligations depend on the activity, implementation, parties, and jurisdictions involved. This section is a prompt for review, not a legal classification of Alkaest or any option.
 
-* **Data protection (LGPD in Brazil, GDPR elsewhere):** a network that keeps personal data on the owner's node and carries only pseudonymous, signed facts (ADR-0003) minimises exposure by design. Alkaest Chatbot, as a commercial service for local businesses, remains responsible for the personal data it processes.
-* **Tokens:** selling or promising returns on a token can make it a security (CVM in Brazil), and exchanging or custodying crypto-assets is regulated (Law 14.478/2022). Options A and B avoid issuing an asset at all.
+* **Data protection:** local storage and pseudonymous signed facts may reduce some exposure, but do not by themselves determine who is responsible or which data-protection duties apply. Review each product and data flow in every operating jurisdiction.
+* **Payments and assets:** token issuance, payments, exchange, custody, escrow, and rewards may raise distinct legal, tax, and consumer-protection questions. Do not treat the absence of a token as a blanket exemption.
 
-Get legal advice before distributing any asset or enabling cross-establishment customer signals.
+Obtain qualified, jurisdiction-specific legal advice before enabling real-money payments, escrow, token or asset distribution, or cross-establishment customer signals.
 
 ---
 

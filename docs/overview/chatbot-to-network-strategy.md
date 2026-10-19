@@ -421,12 +421,12 @@ A decentralized coordination protocol where service providers, customers, develo
 
 ## Network Readiness in the Chatbot (2026-10)
 
-The chatbot repository now carries the concrete design for this bridge in `alkaest-chatbot/docs/NETWORK_READINESS.md`:
+The chatbot implementation and its operational design are in a private repository. This public summary records the current protocol-facing direction; it is sufficient context for discussing or proposing changes here:
 
 - domain facts recorded as append-only, signed events (Space = establishment, Object = appointment, Event, Evidence);
 - an Ed25519 key pair per establishment node from install time;
 - pseudonymous customer identifiers outside the establishment;
 - two-sided reputation: customers rate providers after completed appointments (delay configurable per establishment), and customer reliability is derived from outcomes.
 
-These choices keep the protocol generic: nothing in them is specific to WhatsApp, Google Calendar or barbershops.
+These choices are intended to keep the protocol generic: nothing in them is specific to WhatsApp, Google Calendar or barbershops. The detailed design may change; this summary does not make the private implementation available to public contributors.
 

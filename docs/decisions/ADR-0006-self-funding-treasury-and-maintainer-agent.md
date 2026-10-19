@@ -191,12 +191,9 @@ The target machine has 32 to 64 GB of RAM, or an Apple silicon Mac with 32 GB or
 
 ## Legal Note
 
-This is not legal advice. Get it, and talk to an accountant, before phase B.
+This is not legal or tax advice, and it does not classify the proposed activities under any jurisdiction's laws. Before phase B, obtain qualified legal and accounting advice for the actual operating model and countries involved.
 
-* **Reporting in Brazil.** Receiving donations, paying people and earning mediator fees in crypto have reporting and tax duties: Receita Federal IN 1888/2019 above the monthly threshold, plus income tax on gains and on payment for services.
-* **Regulated services.** Operating escrow for third parties can raise money-transmission or crypto-asset service questions (Law 14.478/2022). Non-custodial multisig, where Alkaest never holds the keys, reduces that exposure but does not remove it.
-* **Holding the treasury.** A non-profit (associação) may become the right holder of the treasury.
-* **Using Bisq.** Conversions through Bisq are still the converting person's responsibility (ADR-0004).
+Items for that review include donation handling, compensation and mediator fees, reporting and tax treatment, third-party escrow, custody and control of treasury funds, consumer obligations, and the legal form that should hold the treasury. Non-custodial multisig does not by itself establish that an activity is outside regulation. Using Bisq does not determine Alkaest's or its users' separate obligations (ADR-0004).
 
 ---
 
