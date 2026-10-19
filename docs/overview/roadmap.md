@@ -217,7 +217,11 @@ Define:
 - negative signals
 - anti-farming rules
 
-#### RFC-0007: Validation and Dispute Resolution
+#### RFC-0013: Validation and Dispute Resolution
+
+(Renumbered from RFC-0007, which now holds the Service Scheduling Module.)
+
+ADR-0006 makes this RFC the home of task mediation: random, verifiable mediator draws from a bonded pool, verdicts on proof of work, appeals to a panel, and mediator fees.
 
 Define:
 
