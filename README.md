@@ -5,6 +5,8 @@ Alkaest is a decentralized protocol for coordinating work through verifiable rep
 The project is protocol-first and currently focused on a desktop-first MVP for open-source development coordination.
 The long-term goal is a broader coordination layer for work where reputation becomes a portable, evidence-based credential.
 
+Interested in contributing? Start with the [contribution guide](CONTRIBUTING.md), read the [Code of Conduct](CODE_OF_CONDUCT.md), and browse [open issues](https://github.com/alkaest-network/alkaest/issues).
+
 ## What Alkaest is trying to build
 
 Alkaest aims to make it possible for people and organizations to coordinate work without relying on centralized platforms as the source of truth.
@@ -20,6 +22,8 @@ In practical terms, that means:
 ## Current direction
 
 The repository currently defines the early architecture and planning layers:
+
+The protocol repository is separate from the node, app, and other component repositories. See the [repository map and access notes](CONTRIBUTING.md#choose-a-repository) before starting implementation work.
 
 - [Vision](docs/overview/vision.md)
 - [Glossary](docs/overview/glossary.md)

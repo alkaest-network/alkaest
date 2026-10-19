@@ -1,0 +1,33 @@
+name: RFC or protocol review
+description: Report an ambiguity, contradiction, missing case, or security assumption in a protocol document.
+title: "RFC review: "
+body:
+  - type: input
+    id: document
+    attributes:
+      label: Document and section
+      description: Include the RFC/ADR number and section heading or link.
+      placeholder: RFC-0003 §10 — WorkItem transitions
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: What is unclear or inconsistent?
+      description: State the observed rule and why it is ambiguous, contradictory, unsafe, or incomplete.
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Concrete example
+      description: Give the smallest event sequence, implementation choice, or user scenario that demonstrates the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and possible direction
+      description: Note design-level compatibility, security, privacy, economic, or usability impact. Do not include exploit details; follow SECURITY.md for vulnerabilities. A proposed fix is optional.
+    validations:
+      required: false

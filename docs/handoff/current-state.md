@@ -32,6 +32,8 @@ Developer UI -> Local Alkaest Node -> Alkaest P2P Network
 GitHub -> Integration Adapter -> Local Alkaest Node
 
 ## Recently completed
+- A draft contribution guide, issue templates, pull request template, Code of Conduct, and security policy are prepared locally; they are not yet published on the public default branch.
+- GitHub snapshot (2026-10-19): the public `main` branch does not yet contain those onboarding files; the issue tracker has no open issues; documentation PRs [#1–#4](https://github.com/alkaest-network/alkaest/pulls) are still open. All four PRs are authored by `alkaest-admin`; none has a formal review recorded, though #3 and #4 have comments from that account. The linked account can access `alkaest-ai`, but its `main` branch has no top-level `LICENSE`; the node, app, Brain, and chatbot repositories returned 404.
 - RFC-0002 defines the desktop-first node architecture.
 - Node architecture visuals now align with the MVP full-node model.
 - RFC-0003 defines the first development workflow module around funded issue-based coordination.

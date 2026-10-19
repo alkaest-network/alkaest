@@ -11,10 +11,10 @@ It captures the main planning gaps, the recommended RFC sequence, and the founde
 
 ### Strongest current material
 
-- Vision and principles in [vision.md](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/overview/vision.md)
-- Shared terminology in [glossary.md](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/overview/glossary.md)
-- Core protocol shell in [0001-protocol-core.md](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0001-protocol-core.md)
-- Desktop-first node architecture in [0002-node-architecture.md](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/rfc/0002-node-architecture.md)
+- Vision and principles in [vision.md](vision.md)
+- Shared terminology in [glossary.md](glossary.md)
+- Core protocol shell in [0001-protocol-core.md](../rfc/0001-protocol-core.md)
+- Desktop-first node architecture in [0002-node-architecture.md](../rfc/0002-node-architecture.md)
 
 ### Still mostly conceptual
 

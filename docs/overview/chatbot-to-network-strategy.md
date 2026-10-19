@@ -15,7 +15,7 @@ The Alkaest protocol remains the long-term decentralized coordination layer.
 
 See also:
 
-- [Chatbot-to-Network Progression](/Users/nivaldojunior/Documents/Alkaest/alkaest/docs/diagrams/chatbot-to-network.md)
+- [Chatbot-to-Network Progression](../diagrams/chatbot-to-network.md)
 
 The goal is not to make the protocol a scheduling chatbot.
 The goal is to use a real scheduling business to create revenue, operational experience, verified service history, and a first marketplace dataset that can later become protocol-native.
