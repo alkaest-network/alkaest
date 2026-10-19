@@ -138,6 +138,8 @@ The project still needs a more explicit treatment of:
 
 ### 9. Future node profiles
 
+> Update 2026-10-18: node profiles (Light, Standard, Service) are now an architectural requirement; see ADR-0003 and RFC-0002 §16. The rollout from one local node to a global testnet is in `network-rollout-plan.md`.
+
 The MVP is full-node-first, but the longer-term architecture still needs a place for:
 
 - light clients
@@ -215,7 +217,11 @@ Define:
 - negative signals
 - anti-farming rules
 
-#### RFC-0007: Validation and Dispute Resolution
+#### RFC-0013: Validation and Dispute Resolution
+
+(Renumbered from RFC-0007, which now holds the Service Scheduling Module.)
+
+ADR-0006 makes this RFC the home of task mediation: random, verifiable mediator draws from a bonded pool, verdicts on proof of work, appeals to a panel, and mediator fees.
 
 Define:
 

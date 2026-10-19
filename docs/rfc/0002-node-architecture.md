@@ -113,6 +113,8 @@ The MVP does not require:
 
 These may be introduced later, but they are not architectural requirements for the first implementation.
 
+> **Amended by ADR-0003 (2026-10-18):** the first *implementation* remains a desktop Standard node, but the *architecture* must support heterogeneous nodes (phones, weak machines, servers) from the start. See §16 Node Profiles. Partial replication and capability advertisement are architectural requirements; the Light profile is the second implementation target.
+
 ---
 
 # 5. Architectural Principles
@@ -520,3 +522,29 @@ This architecture preserves the node-first model established in RFC-0001 while k
 * open-source development coordination
 * protocol correctness
 * future extensibility without present-day light-client complexity
+
+---
+
+# 16. Node Profiles
+
+Added by ADR-0003. All profiles run the same protocol and validate everything they accept (§6.3); they differ in what they store and serve.
+
+## 16.1 Profiles
+
+* **Light** (phone, browser): own identities, keys and spaces; fetches other data on demand; does not serve other nodes; reaches the network through relays; tolerates long offline periods.
+* **Standard** (desktop, mini PC, single-board computer): full history of the spaces it participates in plus a configurable share of other spaces; DHT routing; mailbox for its own identities. This is the MVP profile.
+* **Service** (server with public reachability): large replica share, search indexes, archives, relay and bootstrap services, mailbox for light nodes.
+
+## 16.2 Capability advertisement
+
+Each node publishes a signed capability record: profile, offered roles (relay, indexer, archive, mailbox), storage and bandwidth budgets, reachability (public, NAT, relayed) and observed uptime. Roles are chosen automatically within limits set by the operator and can change as conditions change (a laptop on battery stops relaying).
+
+## 16.3 Trust rule
+
+No profile is trusted more than another. Data served by a Service node is accepted only after the receiver verifies signatures and, for state, replays the relevant log. Light nodes query several Service nodes for the same data so that a single one cannot hide information.
+
+## 16.4 Implications for the components in §7
+
+* **P2P Sync Engine (§7.8):** partial replication, multi-source fetching, relay usage for unreachable peers.
+* **Storage Engine (§7.7):** storage budgets and eviction for replicas the node does not own.
+* **API Server (§7.1):** capability and replication-status queries.

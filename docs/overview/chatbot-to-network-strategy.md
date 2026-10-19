@@ -324,6 +324,8 @@ That RFC should define:
 
 If RFC-0006 remains reserved for reputation proofs and scoring, the service scheduling module can become RFC-0007 or later.
 
+Update (2026-10): the module is specified as [RFC-0007 Service Scheduling Module](../rfc/0007-service-scheduling-module.md).
+
 ---
 
 ## Business Strategy

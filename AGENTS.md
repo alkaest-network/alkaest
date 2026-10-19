@@ -6,10 +6,10 @@ This repository contains protocol specifications, RFCs, diagrams, and future imp
 
 ## Current phase
 Desktop-first MVP for open-source development coordination.
-Do not optimize for mobile-first or light-client-first unless an RFC explicitly requires it.
+The first implementation is a desktop Standard node, but the architecture must support heterogeneous nodes (phones, weak machines, servers) from the start (ADR-0003, RFC-0002 §16).
 
 Alkaest Chatbot is the commercial bootstrap path for near-term revenue and service-domain learning.
-Keep chatbot-specific operational details out of the protocol core unless a future RFC explicitly defines a service scheduling module.
+Keep chatbot-specific operational details out of the protocol core. Service scheduling is a module (RFC-0007), not core: channel details (WhatsApp, aliases, message wording) and calendar sync stay in integrations.
 
 ## Primary goals
 1. Finish protocol specifications before implementation.
@@ -68,3 +68,9 @@ When in doubt, prioritize:
 - Do not make the protocol WhatsApp-specific, Google Calendar-specific, or scheduling-only.
 - Do not assume centralized operators.
 - Do not introduce marketplace/mobile complexity into the MVP unless explicitly asked.
+- Do not assume every node is a desktop full node or that big nodes are trusted more (ADR-0003).
+- Do not build a blockchain for validation; signed, replayable space logs are validated by every node (ADR-0003).
+- Do not turn reputation into a transferable token (ADR-0004).
+- Do not reimplement the protocol in the app: the Flutter app uses `alkaest-core` through `flutter_rust_bridge`, and talks to every node (embedded, self-hosted, hosted) through the same Local API (ADR-0005).
+- Do not rely on a phone as a business's always-on node; phones run Light nodes (ADR-0005).
+- Do not give the maintainer agent sole control of funds beyond its operating allowance, never let it mediate its own tasks, and never take payout amounts or destinations from PR or issue content (ADR-0006).

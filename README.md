@@ -32,6 +32,14 @@ The protocol repository is separate from the node, app, and other component repo
 - [Chatbot-to-Network Diagram](docs/diagrams/chatbot-to-network.md)
 - [RFC-0001 Protocol Core](docs/rfc/0001-protocol-core.md)
 - [RFC-0002 Node Architecture](docs/rfc/0002-node-architecture.md)
+- [RFC-0007 Service Scheduling Module (draft)](docs/rfc/0007-service-scheduling-module.md)
+- [RFC-0009 Node API and SDK Contract (draft)](docs/rfc/0009-node-api-and-sdk-contract.md)
+- [ADR-0003 Heterogeneous Nodes and Network Validation](docs/decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md)
+- [ADR-0004 Token and Settlement Direction](docs/decisions/ADR-0004-token-and-settlement-direction.md)
+- [ADR-0005 Cross-Platform App and Deployment Modes](docs/decisions/ADR-0005-cross-platform-app-and-deployment-modes.md)
+- [ADR-0006 Self-Funding Treasury, Task Bounties with Random Mediation, and the Maintainer Agent](docs/decisions/ADR-0006-self-funding-treasury-and-maintainer-agent.md)
+- [Alkaest Search](docs/overview/alkaest-search.md)
+- [Network Rollout Plan](docs/overview/network-rollout-plan.md)
 
 ## Commercial bootstrap path
 
