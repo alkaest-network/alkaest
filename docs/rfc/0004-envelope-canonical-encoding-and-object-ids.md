@@ -79,7 +79,7 @@ Network transports may wrap it, but they must not change its meaning.
 
 ## 4.3 Hash-addressed integrity
 
-Identifiers and payload verification should be derived from stable cryptographic hashes.
+Identifiers and payload verification MUST be derived from stable cryptographic hashes.
 
 ## 4.4 Minimal cryptographic surface
 
@@ -93,19 +93,17 @@ The MVP should adopt one primary signature algorithm and one primary hash functi
 
 All signed protocol payloads MUST be canonically encoded as **UTF-8 JSON** using a deterministic canonicalization procedure.
 
-This RFC refers to that procedure as **Alkaest Canonical JSON v1**.
+Payloads MUST use the JSON Canonicalization Scheme (JCS) defined by [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785.html). This RFC refers to those bytes as canonical JSON v1. Implementations MUST also enforce RFC 8785's I-JSON constraints, including rejection of duplicate property names and values that cannot be represented as IEEE 754 binary64 numbers.
 
 ## 5.2 Canonicalization rules
 
 The canonicalization procedure MUST obey the following rules:
 
-* objects are encoded with keys sorted lexicographically by Unicode code point
+* property sorting, string escaping, number serialization, and whitespace follow RFC 8785 exactly
 * arrays preserve their original order
-* strings are encoded as JSON strings in UTF-8
-* numbers MUST be integers or JSON numbers that round-trip exactly
-* insignificant whitespace is not permitted
-* object members with `null` values MUST be preserved if present
-* object members that are absent MUST remain absent
+* strings are not Unicode-normalized; strings must be valid Unicode scalar sequences
+* object members with `null` values are preserved if present; absent members remain absent
+* protocol amounts, counters, and integers that may exceed the interoperable binary64 safe-integer range MUST be represented as schema-validated decimal strings, not JSON numbers
 
 ## 5.3 Disallowed values
 
@@ -149,7 +147,7 @@ Hashes MUST be computed over the exact canonical UTF-8 bytes of the payload bein
 
 ## 6.3 Hash encoding
 
-Hashes SHOULD be represented in lowercase hexadecimal when rendered as strings.
+Hashes MUST be represented in lowercase hexadecimal when rendered as strings.
 
 Example:
 
@@ -157,7 +155,7 @@ Example:
 3f5e...abcd
 ```
 
-Base64 encodings MAY be used internally by implementations, but protocol-visible string fields SHOULD prefer lowercase hexadecimal for consistency.
+Protocol-visible SHA-256 hashes MUST be 64 lowercase hexadecimal characters. Other encodings are not valid for hash fields.
 
 ---
 
@@ -177,9 +175,7 @@ The signature MUST be created over the canonical UTF-8 bytes of the envelope sig
 
 ## 7.3 Public key encoding
 
-Public keys SHOULD be represented as lowercase hexadecimal or base64url strings in implementation interfaces, but each implementation MUST choose one stable external form.
-
-For protocol-level validation, the critical requirement is that the same public key bytes are recovered unambiguously before verification.
+Ed25519 public keys MUST be encoded as unpadded base64url of exactly 32 bytes. Decoders MUST reject padding, non-URL-safe characters, any decoded length other than 32 bytes, and non-canonical encodings (decode then re-encode and require byte-for-byte string equality).
 
 ---
 
@@ -187,8 +183,7 @@ For protocol-level validation, the critical requirement is that the same public 
 
 ## 8.1 General rule
 
-Unless otherwise noted, protocol identifiers SHOULD be content-derived.
-That means an identifier is generated from a stable hash of canonical payload content or canonical signing material.
+All MVP identifiers are content-derived from canonical immutable preimages using SHA-256 with the fixed domain separation and prefix rules below.
 
 This allows nodes to:
 
@@ -198,9 +193,9 @@ This allows nodes to:
 
 ## 8.2 Identifier prefixing
 
-For readability and type separation, identifiers SHOULD include a short type prefix.
+For readability and type separation, identifiers MUST include the fixed type prefix below.
 
-Recommended prefixes:
+MVP prefixes:
 
 ```text
 idn_  Identity
@@ -219,55 +214,49 @@ att_  AttachmentRef
 
 As established in RFC-0001, the Identity ID MUST be derived from the hash of the public key.
 
-Recommended derivation:
+Derivation:
 
 ```text
-idn_ + hex(SHA-256(publicKeyBytes))
+idn_ + lowercase-hex(SHA-256(UTF8("alkaest:id:v1:identity") || 0x00 || publicKeyBytes))
 ```
 
 ## 8.4 Object IDs
 
 Object identifiers MUST be deterministic and derived from canonical object creation content.
 
-Recommended rule:
+For an object, event, relation, message, decision, and attachment reference, the schema MUST define an immutable ID preimage that excludes its own ID field. IDs MUST use domain-separated SHA-256 over the canonical preimage. Object IDs MUST use the immutable creation record, excluding projection-derived fields such as `updatedAt`; mutable changes are events. A schema MUST NOT derive an ID from a record that includes the ID itself.
+
+For the MVP, prefixes and domain labels are fixed as `obj` / `alkaest:id:v1:object`, `evt` / `alkaest:id:v1:event`, `rel` / `alkaest:id:v1:relation`, `msg` / `alkaest:id:v1:message`, `dec` / `alkaest:id:v1:decision`, and `att` / `alkaest:id:v1:attachment-ref`. The encoded form is the prefix, underscore, and lowercase hex digest. Hash input is UTF-8 domain label, one zero byte, then canonical preimage bytes.
+
+Identity ID uses the public key bytes as preimage and the domain label above. Envelope ID uses the canonical signing payload bytes with domain label `alkaest:id:v1:envelope`.
+
+Object ID rule:
 
 ```text
-obj_ + hex(SHA-256(canonical Object payload bytes))
+obj_ + lowercase-hex(SHA-256(UTF8("alkaest:id:v1:object") || 0x00 || canonicalCreationRecordBytes))
 ```
 
-The same rule applies to:
-
-* Space
-* Membership
-* Relation
-* Message
-* Decision
-
-with their corresponding type prefix.
+Space, membership, relation, message, and decision creation records use the corresponding prefix and domain label listed in §8.4. In every case, the schema defines the immutable creation preimage and excludes the identifier field.
 
 ## 8.5 Event IDs
 
-Event identifiers MUST be derived from canonical event payload bytes.
-
-Recommended rule:
+Event identifiers MUST be derived from the canonical immutable event payload, excluding `eventId`, using domain label `alkaest:id:v1:event`.
 
 ```text
-evt_ + hex(SHA-256(canonical Event payload bytes))
+evt_ + lowercase-hex(SHA-256(UTF8("alkaest:id:v1:event") || 0x00 || canonicalEventRecordBytes))
 ```
 
 ## 8.6 Envelope IDs
 
-Envelope identifiers MUST be derived from canonical envelope signing payload bytes.
-
-Recommended rule:
+Envelope identifiers MUST be derived from canonical envelope signing payload bytes with domain label `alkaest:id:v1:envelope`.
 
 ```text
-env_ + hex(SHA-256(canonical envelope signing payload bytes))
+env_ + lowercase-hex(SHA-256(UTF8("alkaest:id:v1:envelope") || 0x00 || canonicalSigningPayloadBytes))
 ```
 
 ## 8.7 AttachmentRef IDs
 
-Attachment reference IDs SHOULD be derived from the attachment content hash and attachment metadata.
+Attachment reference IDs MUST use the `att` prefix and `alkaest:id:v1:attachment-ref` domain label over the canonical immutable attachment-reference record, excluding `id`.
 
 ---
 
@@ -310,14 +299,14 @@ attachment_ref
 
 ## 9.2 payloadBytes
 
-`payloadBytes` represents the canonical UTF-8 JSON bytes of the enclosed protocol payload.
+The wire field `payloadBytes` MUST be an unpadded base64url string encoding the exact canonical UTF-8 JSON payload bytes. Decoders MUST reject non-canonical base64url encodings by decoding and re-encoding, then requiring byte-for-byte string equality. After decoding, implementations MUST validate UTF-8, parse without duplicate keys, canonicalize with RFC 8785, and require byte-for-byte equality with the received bytes.
 
 ## 9.3 payloadHash
 
-`payloadHash` is:
+`payloadHash` is the SHA-256 digest of the decoded canonical payload bytes, encoded as 64 lowercase hexadecimal characters:
 
 ```text
-hex(SHA-256(payloadBytes))
+lowercase-hex(SHA-256(decodedCanonicalPayloadBytes))
 ```
 
 ## 9.4 Signing payload
@@ -325,7 +314,7 @@ hex(SHA-256(payloadBytes))
 The signature is NOT created over the raw envelope object including the signature field.
 Instead, it is created over a canonical **Envelope Signing Payload**.
 
-Recommended structure:
+Required structure:
 
 ```text
 EnvelopeSigningPayload
@@ -342,13 +331,11 @@ This payload MUST be canonically encoded before signing.
 
 ## 9.5 envelopeId
 
-`envelopeId` is derived from the canonical bytes of `EnvelopeSigningPayload`.
+`envelopeId` is `env_` plus lowercase hex of the domain-separated SHA-256 digest of the canonical bytes of `EnvelopeSigningPayload`.
 
 ## 9.6 Signature field
 
-The `signature` field contains the Ed25519 signature bytes encoded as a stable string representation chosen by the implementation.
-
-For interoperability, base64url without padding is RECOMMENDED.
+The `signature` field MUST be unpadded base64url encoding exactly 64 Ed25519 signature bytes. Decoders MUST reject padding, non-URL-safe characters, any other decoded length, and non-canonical encodings by requiring decode/re-encode string equality.
 
 ---
 
@@ -362,7 +349,7 @@ To construct an envelope, a node MUST perform the following steps:
 4. Derive `objectId` from the canonical payload if it is not already fixed by a prior rule.
 5. Construct `EnvelopeSigningPayload`.
 6. Canonically encode `EnvelopeSigningPayload`.
-7. Compute `envelopeId = SHA-256(signingPayloadBytes)`.
+7. Compute `envelopeId = SHA-256(UTF8("alkaest:id:v1:envelope") || 0x00 || signingPayloadBytes)` and encode it as `env_` plus lowercase hex.
 8. Sign `signingPayloadBytes` with the author's private key using Ed25519.
 9. Assemble the final envelope.
 
@@ -427,7 +414,6 @@ Example payload object:
 
 ```json
 {
-  "createdAt": "2026-03-16T21:15:00Z",
   "objectType": "work_item",
   "ownerIdentityId": "idn_abc123",
   "schemaId": "alkaest.workflow.work_item.v1",
@@ -438,7 +424,7 @@ Example payload object:
 Canonical encoded form:
 
 ```json
-{"createdAt":"2026-03-16T21:15:00Z","objectType":"work_item","ownerIdentityId":"idn_abc123","schemaId":"alkaest.workflow.work_item.v1","spaceId":"spc_example"}
+{"objectType":"work_item","ownerIdentityId":"idn_abc123","schemaId":"alkaest.workflow.work_item.v1","spaceId":"spc_example"}
 ```
 
 ## 12.2 Why this matters
@@ -472,6 +458,8 @@ The canonical encoding rules in this RFC remain independent from application sch
 ---
 
 # 14. Implementation Notes
+
+The language-neutral known-answer fixtures are in [RFC-0004 conformance vectors](vectors/rfc-0004.json). Implementations MUST verify every applicable fixture, including rejection cases, before claiming conformance. The suite is Draft until exercised by independent implementations.
 
 Implementations SHOULD:
 

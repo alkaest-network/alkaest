@@ -5,7 +5,7 @@ flowchart LR
     subgraph USER["Developer Environment"]
         UI["Developer UI"]
         AUTO["Local Automation"]
-        NODE["Local Alkaest Node"]
+        NODE["Local Standard Node (first implementation target)"]
         UI --> NODE
         AUTO --> NODE
     end
@@ -45,7 +45,7 @@ flowchart LR
 
 ## Notes
 
-- The MVP is desktop-first and assumes a local full node per developer.
+- The first implementation target is a local Standard node. The architecture also supports Light and Service profiles; see [RFC-0002](../rfc/0002-node-architecture.md) and [ADR-0003](../decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md).
 - The local node is the protocol boundary for UI, automation, and integrations.
 - GitHub and CI systems are inputs to the node, not protocol authorities.
 - Detailed node internals are described in [node-architecture.md](node-architecture.md).

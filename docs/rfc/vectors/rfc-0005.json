@@ -1,0 +1,97 @@
+{
+  "suite": "Alkaest RFC-0005 event-state conformance vectors",
+  "suiteVersion": 1,
+  "status": "Draft",
+  "fixtureModel": {
+    "objectId": "obj_fixture",
+    "version0Head": null,
+    "events": {
+      "A": {"kind": "ordinary-state-event", "targetVersion": 1, "prevEventId": null, "valid": true},
+      "B": {"kind": "ordinary-state-event", "targetVersion": 1, "prevEventId": null, "valid": true},
+      "A2": {"kind": "ordinary-state-event", "targetVersion": 2, "prevEventId": "A", "valid": true},
+      "R": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
+      "R1": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
+      "R2": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
+      "R_invalid": {"kind": "resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": false}
+    },
+    "symbolicIds": "A/B/R labels stand for distinct eventIds in this state-machine fixture; they are labels, not protocol wire IDs. Authorization and module-transition outcomes are supplied as fixture inputs."
+  },
+  "cases": [
+    {
+      "id": "single-event-applies",
+      "deliver": ["A"],
+      "expected": {"head": "A", "version": 1, "state": {"A": "applied"}}
+    },
+    {
+      "id": "duplicate-delivery-is-idempotent",
+      "deliver": ["A", "A"],
+      "expected": {"head": "A", "version": 1, "storedEnvelopeCount": 1, "state": {"A": "applied"}}
+    },
+    {
+      "id": "out-of-order-predecessor-arrives",
+      "deliver": ["A2", "A"],
+      "expected": {"head": "A2", "version": 2, "state": {"A": "applied", "A2": "applied"}}
+    },
+    {
+      "id": "missing-predecessor-remains-pending",
+      "deliver": ["A2"],
+      "expected": {"head": null, "version": 0, "state": {"A2": "pending"}}
+    },
+    {
+      "id": "competing-children-delivered-forward",
+      "deliver": ["A", "B"],
+      "expected": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting"}}
+    },
+    {
+      "id": "competing-children-delivered-reverse",
+      "deliver": ["B", "A"],
+      "expected": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting"}}
+    },
+    {
+      "id": "late-branch-rebuilds-provisional-head",
+      "phases": [
+        {"deliver": ["A"], "expected": {"head": "A", "version": 1, "provisional": true}},
+        {"deliver": ["B"], "expected": {"head": null, "version": 0, "provisional": true, "state": {"A": "conflicting", "B": "conflicting"}}}
+      ]
+    },
+    {
+      "id": "unresolved-branch-withholds-descendants",
+      "deliver": ["A", "B", "A2"],
+      "expected": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "A2": "pending"}}
+    },
+    {
+      "id": "unique-authorized-resolution",
+      "deliver": ["A", "B", "R"],
+      "expected": {"head": "R", "version": 1, "state": {"A": "conflicting", "B": "conflicting", "R": "applied"}}
+    },
+    {
+      "id": "resolution-waits-for-referenced-branches",
+      "phases": [
+        {"deliver": ["R"], "expected": {"head": null, "version": 0, "state": {"R": "pending"}}},
+        {"deliver": ["A", "B"], "expected": {"head": "R", "version": 1, "state": {"A": "conflicting", "B": "conflicting", "R": "applied"}}}
+      ]
+    },
+    {
+      "id": "unauthorized-resolution-does-not-resolve",
+      "deliver": ["A", "B", "R_invalid"],
+      "expected": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "R_invalid": "rejected"}}
+    },
+    {
+      "id": "competing-authorized-resolutions-stay-unresolved",
+      "deliver": ["A", "B", "R1", "R2"],
+      "expected": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "R1": "conflicting", "R2": "conflicting"}}
+    },
+    {
+      "id": "competing-resolutions-are-arrival-order-independent",
+      "eventSet": ["A", "B", "R1", "R2"],
+      "deliverPermutations": [["A", "B", "R1", "R2"], ["R2", "B", "R1", "A"], ["B", "R1", "A", "R2"]],
+      "expectedForEveryPermutation": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "R1": "conflicting", "R2": "conflicting"}}
+    },
+    {
+      "id": "arrival-order-does-not-change-projection",
+      "eventSet": ["A", "B", "A2"],
+      "deliverPermutations": [["A", "B", "A2"], ["A2", "A", "B"], ["B", "A2", "A"]],
+      "expectedForEveryPermutation": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "A2": "pending"}}
+    }
+  ]
+}

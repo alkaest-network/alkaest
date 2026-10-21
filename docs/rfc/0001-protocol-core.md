@@ -239,7 +239,7 @@ Object
 - visibility
 - attachmentRefs
 - createdAt
-- updatedAt
+- updatedAt (derived projection metadata; MUST NOT be part of the immutable signed creation record)
 ```
 
 ### objectType

@@ -1,9 +1,11 @@
 # ADR-0006 - Self-Funding Treasury, Task Bounties with Random Mediation, and the Maintainer Agent
 
-**Status:** Accepted (direction); mechanisms to be specified in RFC-0008 and RFC-0013
+**Status:** Accepted (direction); treasury and release authorization are further specified in ADR-0007 and RFC-0014; settlement and mediation mechanisms remain in RFC-0008 and RFC-0013
 **Date:** 2026-10-18
 **Decision Type:** Economic, Security and Operations
-**Related:** RFC-0003 (§4.2, §4.3, §11), ADR-0003, ADR-0004, ADR-0005, RFC-0006, RFC-0008, RFC-0013
+**Related:** RFC-0003 (§4.2, §4.3, §11), ADR-0003, ADR-0004, ADR-0005, ADR-0007, RFC-0006, RFC-0008, RFC-0013, RFC-0014
+
+> **Implementation boundary:** The mediator lottery, “proof of reading,” bond/slashing, fee proposals, fiat collateral, and mediator-assisted 2-of-3 spend paths below are design proposals from this ADR, not finalized protocol rules. Draft RFC-0013 now supersedes them where it explicitly defers a mechanism. In particular, the first Bitcoin block after claim is not an accepted secure selection algorithm, a signature cannot prove human comprehension, and a mediator verdict is not authority to spend an escrow. Disputed real-funds spending is disabled pending joint RFC-0008/RFC-0013 design and independent Bitcoin script/key review.
 
 ---
 
@@ -45,12 +47,12 @@ When a task is accepted by a worker, the protocol draws a **mediator**. The draw
 * **Eligible:**
   * the identity runs a **mediator node with a local AI** (§2.1) and advertises the mediator role for that domain;
   * it has posted a **bond**;
-  * its domain reputation (RFC-0006) is above the minimum;
+  * it meets the domain's validation eligibility policy; any reputation criterion is disabled until RFC-0006's integrity launch gate is met;
   * it has no conflict of interest: it is not the creator or the worker, is not linked to either, and has not mediated the same pair recently.
 * **Random, verifiable and not chosen by anyone:**
   * the seed is SHA-256 of the hash of the first Bitcoin block mined after the claim, plus the task id;
   * each candidate's ticket is SHA-256(seed ‖ identityId);
-  * the lowest ticket wins, weighted by bond and reputation;
+  * the lowest ticket wins under a deterministic eligible-candidate rule; no weighting by reputation is enabled until RFC-0006 defines and validates it;
   * if that mediator does not accept in time, the next ticket is asked.
 
   Any node can recompute the draw.
@@ -94,7 +96,7 @@ An **appeal** goes to a panel of three mediators drawn the same way. Its verdict
 | Method | Escrow | Phase |
 |---|---|---|
 | BTC on-chain | 2-of-3 multisig | First |
-| BTC Lightning | Hold invoice with timeout (small amounts) | First |
+| BTC Lightning | Hold invoice with timeout (small amounts) | Later, after a separate settlement RFC and timeout/refund review |
 | Stablecoin on Bitcoin layers (for example USDt on Liquid) | Liquid multisig | Later |
 | Fiat (PIX, bank) | BTC security deposits only | Later |
 
@@ -111,20 +113,20 @@ Both are outputs of the escrow's release and refund transactions, built by every
 
 ### 5. The treasury and the maintainer agent
 
-The Alkaest treasury is one more task creator. It is operated by a **local AI agent**.
+The Alkaest treasury is one more task creator. A local AI agent, called the **Brain** for planning, proposes and prioritizes candidate work under the signed budget policy. ADR-0007 and RFC-0014 refine this direction: the Brain selects an eligible issue and proposes its exact BTC bounty from permitted evidence and a deterministic verified balance; a separate policy gate authorizes publication and funding. The Brain has no treasury signing keys and cannot treat its estimates as verified funds.
 
 What the agent does from day one:
 
-1. **Plan.** It keeps a **needs board** in the `alkaest-network` space. Examples of needs:
+1. **Plan.** It keeps a **needs board** in the `alkaest-network` space. The founder seeds initial candidate needs and budget boundaries; after that, permitted metrics, reports, feedback, complaints, contributor quotes and verified treasury state inform the Brain's ranking. Examples of needs:
    * a visual identity;
    * an RFC-0007 implementation;
    * a security review;
    * translations;
    * hosting costs.
 
-   Each need has acceptance criteria, an estimated price range, and a priority score. The score is based on unblocking revenue, security, roadmap position, user-reported pain, and cost.
+   Each need has acceptance criteria and evidence references. The Brain records priority, confidence, pricing evidence and its proposed BTC bounty; unsupported estimates are deferred or escalated rather than presented as market prices.
 2. **Publish.** It shows the needs board and the treasury balance publicly, in the repository, the site and the app. The board doubles as the donation pitch.
-3. **Fund.** When money is available, it opens tasks for the highest-priority needs within the budget policy (§6), funds their escrows, and pays the fees.
+3. **Fund.** A deterministic ledger computes spendable BTC after reservations, pending payouts, fees, obligations and the protected reserve. If the Brain's selected task and proposed bounty fit the signed policy and balance gates, the agent may publish and fund it; otherwise the decision is deferred or escalated. Candidate backlog entries are not open or funded tasks.
 4. **Review first.** It writes a first-pass review on each deliverable, including deterministic gates for code: CI, tests, lint and license. This helps the mediator, but **the agent is never the mediator of its own tasks**, because that is a conflict of interest.
 5. **Report.** It publishes monthly what was funded, delivered and paid, all verifiable from the log.
 
@@ -138,7 +140,7 @@ What the agent does from day one:
 
 Human intervention is reduced to **refilling the operating allowance once per period** and **changing the budget policy**. The worst case of an agent fully compromised is losing one allowance. The reserve cannot move without the maintainer or the reserve's mediator.
 
-The agent never approves its own payments, because random mediators do. That is what lets it run with minimal intervention.
+For routine Alkaest work, the agent acts as the project requester and may accept a contributor's delivery and authorize an uncontested payout when the funded WorkItem's predeclared evidence gates pass. For code, this includes the exact merged revision, required independent reviews, and required CI/security checks; a PR approval by itself is not sufficient. The agent MUST NOT receive payment for its own task, control the contributor's payout destination, alter the policy, or mediate a dispute on a task it funded. Disputes and exceptions go to an independent mediator under RFC-0013. ADR-0007 and RFC-0014 define this boundary and the Bitcoin audit trail.
 
 ### 6. Budget policy
 
@@ -154,19 +156,19 @@ The policy is a signed object in the `alkaest-network` space. The agent reads it
 | Phase | What runs | Human role |
 |---|---|---|
 | **A. Simulation (now)** | Agent planning, needs board, tasks, escrows and mediator draws, on Bitcoin `regtest`/`signet` with test repositories | Watches and tunes the agent |
-| **B. Supervised** | Mainnet with real donations; the maintainer and invited reviewers form the first mediator pool | Refills the allowance; approves needs priced outside the guidance; serves as a mediator for others' tasks when drawn |
-| **C. Open mediation** | Anyone with bond and reputation can be drawn as a mediator | Refills the allowance; changes the policy |
+| **B. Supervised** | Real-money operation only after all launch gates; initial operation is human-supervised | Refills the allowance; approves out-of-policy needs; any mediation follows conflict rules |
+| **C. Open mediation** | Eligible participants can be drawn under RFC-0013; any reputation-based eligibility remains gated by RFC-0006 | Refills the allowance; changes the policy |
 | **D. Self-running** | Several maintainers co-sign the reserve and govern the policy by quorum (RFC-0012) | Governance only |
 
-**Day zero means phase A today.** The agent can plan, price, prioritize and publish the needs board immediately. Spending real money waits for phase B, after the legal check below.
+**Phase A is simulation only.** The agent can plan, price, prioritize and publish a simulated needs board. Real-money operation waits for every launch gate in ADR-0007 and the roadmap, including accepted RFC-0008/0013/0014 behavior, adversarial testing, recovery drills, independent security review, and legal/accounting review.
 
 ---
 
 ## Security Considerations
 
-* **Prompt injection.** Everything the agent reads can be attacker-controlled: issues, PRs, deliverables and comments. The agent's only spending power is the operating allowance, capped by policy. Amounts are fixed when a task is funded. Payout destinations come from the worker's signed claim, never from content. Release needs a mediator who is not the agent.
-* **Sybil mediators.** An attacker who creates many identities to get drawn for their own task is stopped by three things: bonds, minimum reputation, conflict-of-interest exclusion and per-draw weighting. The bond is forfeited when an appeal overturns a verdict.
-* **Collusion between mediator and worker** is limited by the random draw, bonds, appeals and reputation loss. For large tasks, a panel of three mediators can be required from the start.
+* **Prompt injection.** Everything the agent reads can be attacker-controlled: issues, PRs, deliverables and comments. The agent's spending power is capped by policy and the operating allowance. Amounts are fixed when a task is funded. Payout destinations come from the worker's signed claim, never from content. Routine uncontested release follows predeclared gates; disputes require an independent mediator.
+* **Sybil mediators.** Bonds, reputation thresholds, random draws, and conflict checks do not prove distinct human control. Related identities may evade protocol-visible checks. RFC-0013 must define candidate caps, conflict handling, panels, appeals, and exposure limits; RFC-0006 must define any reputation-derived eligibility. Until these rules pass review, do not describe the mediator pool as Sybil-resistant or open mediation as launch-ready.
+* **Mediator/worker collusion.** Random selection and bonds may raise the cost but do not prevent a colluding group from controlling several identities. High-impact tasks require an independently selected panel and appeal path under RFC-0013; limits and human oversight remain necessary.
 * **Collusion between the reserve's mediator and the agent** could move the reserve without the maintainer. Three measures limit it:
   * the reserve's mediator must post a bond proportional to the reserve;
   * it is redrawn every budget period;
@@ -177,7 +179,7 @@ The policy is a signed object in the `alkaest-network` space. The agent reads it
 * **Randomness bias.** The seed uses a future Bitcoin block hash. A miner could bias the draw only by throwing away valid blocks, which costs far more than a typical task. For very large tasks, the seed can combine several blocks.
 * **Untrusted deliverables.** Code from tasks runs only in isolated CI or throwaway VMs, never on the machine that holds the agent's or the reserve's keys.
 * **Least privilege for the agent.** GitHub tokens are limited to issues and comments, with no merge rights. The network reaches only GitHub and its own Bitcoin and Lightning nodes. Every action is a signed event or a public comment.
-* **Bootstrapping the mediator pool.** Phase B starts with a small, known pool, so the draw is less decentralized until phase C. This is stated publicly.
+* **Bootstrapping the mediator pool.** A small initial pool is a trust assumption, not proof of decentralization. Publish its membership, conflicts, decision history, limits, and appeal path; keep consequential decisions supervised until independent participation and RFC gates justify expansion.
 
 ---
 
@@ -218,11 +220,12 @@ Items for that review include donation handling, compensation and mediator fees,
 1. **Specs:**
    * RFC-0013 Validation and Mediation: eligibility, draw, verdicts, appeals, bonds;
    * RFC-0008 Escrow, Bonds and Settlement: 2-of-3 escrows, Lightning hold invoices, security deposits, fee outputs;
-   * RFC-0003 updates: task offer fields, payout destination in the claim, needs board, budget policy.
+   * RFC-0003 updates: task offer fields, payout destination in the claim, needs board, budget policy;
+   * RFC-0014 Treasury Agent and Release Authorization: policy-bound issue funding, provider evidence, automated acceptance/payout gates, and Bitcoin audit anchors.
 2. **Agent, phase A, planning only:** the needs board with priorities and price estimates, published from the `alkaest-network` space. It needs no money and can run on day zero.
 3. **Treasury service in `alkaest-node`** (Rust, BDK): reserve and allowance wallets, escrow creation and release, on `regtest`.
 4. **Mediator draw, cooperative close, AI pre-analysis, conciliation and verdict flow** in the node. The mediator node reuses `alkaest-brain` for the pre-analysis. The app gets screens for mediators (review the deliverable, sign the verdict) and for workers (claim, deliver, receive).
-5. **Phase B, after the legal check:** mainnet, donation addresses, published policy, and the first mediator pool.
+5. **Phase B, only after all launch gates:** supervised real-money operation, published policy, key recovery drills, independent security review, and a mediator pool governed by RFC-0013. Legal review alone or RFC-0014 alone is insufficient.
 
 ---
 

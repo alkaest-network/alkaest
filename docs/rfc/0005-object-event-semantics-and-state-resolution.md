@@ -266,7 +266,9 @@ An event is `applied` when:
 * its envelope is valid
 * module-level validation passes
 * its sequencing fields match the current applied head
-* it wins any deterministic conflict comparison required by this RFC
+* no unresolved valid competing event exists for the same state slot, or it is the uniquely authorized resolution for that conflict
+
+`applied` describes a node's projection over its currently known valid event set. It is not global finality. Arrival of a delayed valid event can cause a deterministic rebuild and change the projected head. Modules MUST define a finality predicate before an applied state can authorize an irreversible external effect. RFC-0003 work acceptance or a locally applied treasury authorization alone MUST NOT cause payment; RFC-0008 settlement confirmation is required for `paid`.
 
 ## 8.3 Rejected
 
@@ -286,9 +288,9 @@ An event is `conflicting` when:
 
 * its envelope is valid
 * its module semantics are individually valid
-* but another event already occupies the same next-state slot deterministically
+* it competes with another valid event for the same parent and target version, so no business outcome can yet be selected
 
-Conflicting events are not applied to the canonical projection state unless a later resolution event or rule reintroduces them.
+The common ancestor remains the projected head while the conflict is unresolved. Descendants of either branch remain pending and MUST NOT advance the projection. Conflicting records remain available for audit.
 
 ---
 
@@ -324,24 +326,25 @@ If an event references:
 * a `targetVersion` already passed, or
 * a `prevEventId` that is no longer the applied head
 
-then the event becomes `conflicting` unless a module-specific rule explicitly classifies it as `rejected`.
+then the event is classified against the complete known branch set: it is `conflicting` if it forms a valid competing branch, or `rejected` if module validation fails. Nodes MUST NOT discard it solely because its parent is no longer the locally projected head.
 
 ## 9.5 Conflict slot
 
-For each object version step, only one state-changing event may become the canonical applied event.
+For each object version step, more than one valid event may exist in the replicated log. If multiple valid events share the same parent and target version, nodes MUST keep the object at their common ancestor and mark the competing branches `conflicting` until an authorized resolution is available.
 
-If multiple valid candidate events compete for the same slot, nodes MUST choose a deterministic winner.
+## 9.6 Authorized conflict resolution
 
-## 9.6 Deterministic conflict winner
+An authoritative resolution MUST be a schema-defined state-changing event that identifies the exact competing event IDs and branch point, and whose authority is verified by the relevant module or Space policy. If any referenced competing event has not yet been received, the resolution remains `pending` and MUST NOT affect the projection until its dependencies arrive and validation is repeated. A uniquely valid authorized resolution event determines the canonical successor regardless of arrival order; ordinary competing children become `conflicting`. If two or more valid resolution events compete at the same slot, the conflict remains unresolved. No implementation may select a business outcome by choosing the lexicographically smallest `eventId`; IDs provide identity and deduplication only.
 
-The default MVP winner rule is:
+## 9.7 Draft baseline for non-financial conflict authority
 
-1. Prefer an authoritative resolution event over a normal state-changing event if both target the same next slot and are otherwise valid.
-2. If candidate classes are equal, choose the candidate with the lexicographically smallest `eventId`.
+For the MVP, parties SHOULD first have the option to resolve a non-financial conflict by mutual agreement. An optional mediator may facilitate that agreement but has no authority to change protocol state; the outcome takes effect only through the required party-signed events.
 
-All other candidates for that slot become `conflicting`.
+If agreement is unavailable, the proposed baseline is a Space-scoped panel of three distinct, pre-authorized resolver identities, with approval by at least two eligible panel members for one exact resolution digest. The roster and threshold MUST be fixed by a versioned Space policy before the conflict is known. A resolver with a declared or policy-visible conflict MUST abstain; if fewer than two eligible members remain, the conflict stays unresolved until an authorized roster update or other policy-defined recovery. Neither the affected parties nor a conflicted resolver may appoint a replacement for that case.
 
-This rule is intentionally simple and exists to ensure convergence before richer conflict markets or governance rules exist.
+A resolution MUST name the object, common ancestor, all competing branch roots known to the resolver panel at decision time, selected branch or module-valid cancellation outcome, evidence references, policy/roster version, and appeal route. It MUST NOT rewrite prior events, change unrelated objects, or authorize moderation sanctions, reputation penalties, escrow release/refund, or treasury spending. Mediation, branch resolution, moderation, and financial settlement remain separate authorities; payment cases follow RFC-0013 and RFC-0008.
+
+This is a Draft direction, not an accepted deployment policy. The exact resolver-approval event schema, reviewer independence criteria, roster rotation/key-loss procedure, and appeal relationship require cross-review with RFC-0003, RFC-0008, and RFC-0013 before implementation. Until then, modules MUST fail closed on unresolved conflicts and MUST NOT infer a resolver from event order, identity rank, or hardware capacity.
 
 ---
 
@@ -358,7 +361,7 @@ open -> assigned
 assigned -> in_progress
 in_progress -> submitted
 submitted -> accepted
-accepted -> paid
+accepted -> payout_authorized -> paid
 paid -> closed
 ```
 
@@ -380,32 +383,28 @@ Nodes MUST be able to rebuild projections from stored protocol records alone.
 
 Recommended rebuild algorithm per object:
 
-1. Load the object creation record.
-2. Initialize the projection state from the object creation payload.
-3. Gather all valid event envelopes targeting that object.
-4. Partition them into state-changing and non-state-changing classes where module rules require.
-5. Repeatedly apply the eligible next event according to the resolution rules in this RFC.
-6. Mark unresolved future events as `pending`.
-7. Mark losing same-slot events as `conflicting`.
-8. Mark invalid events as `rejected`.
-9. Build derived query projections from the resulting canonical object state.
+1. Load the object creation record and initialize version `0`.
+2. Gather all events targeting the object; validate envelopes, schemas, permissions, and module transitions.
+3. Build the valid state-changing event graph by `prevEventId` and `targetVersion`.
+4. Starting at the creation head, advance only when there is exactly one valid child, or exactly one valid authorized resolution that resolves the current conflict.
+5. Stop at the common ancestor whenever multiple unresolved valid children or resolutions compete.
+6. Mark descendants of unresolved branches `pending`, competing branch roots `conflicting`, and invalid events `rejected`.
+7. Project non-state-changing events according to their module-defined stable order; event ID may break display-order ties but MUST NOT determine business authority.
+8. Build derived query projections from the resulting state and expose conflict/finality metadata.
 
-This algorithm MUST produce the same applied head when the input envelope set is the same.
+This algorithm MUST produce the same projection and conflict classification when the input envelope set is the same, independent of arrival order. Nodes MUST rebuild affected descendants when the known event set changes.
 
 ---
 
 # 12. Deterministic Ordering for Projection Work
 
-When multiple candidate envelopes are otherwise ready for the same processing step, nodes SHOULD sort them by:
+For stable transport, indexing, and display, nodes SHOULD sort event records by:
 
 1. `targetVersion`
 2. `createdAt`
 3. `eventId`
 
-The tie-breaker on `eventId` ensures stable ordering even if timestamps are equal.
-
-Ordering alone does not decide validity.
-It only ensures that deterministic processing does not depend on local arrival order.
+This order does not resolve a state conflict or establish authority. State progression follows §9 and the event graph, not timestamp order.
 
 ---
 
@@ -457,13 +456,14 @@ Events received:
 * `evt_a`: `work_item.assigned`, `targetVersion=2`, `prevEventId=evt_funded`
 * `evt_b`: `work_item.assigned`, `targetVersion=2`, `prevEventId=evt_funded`
 
-If both events are individually valid and no authoritative resolution event exists:
+If both events are individually valid and no authorized resolution exists:
 
-* sort by deterministic winner rule
-* apply the winner
-* mark the loser as `conflicting`
+* keep the projection at `evt_funded`
+* classify both assignment events as `conflicting`
+* keep their descendants pending
+* require a module-authorized `work_item.assignment_resolved` event naming the conflict and selected branch
 
-All honest nodes with the same event set will therefore converge on the same assignee projection.
+All honest nodes with the same event set therefore converge on the same unresolved conflict, without making a hash-derived choice of assignee.
 
 ---
 
@@ -475,12 +475,15 @@ Nodes SHOULD expose local visibility into:
 * rejected events
 * conflicting events
 * current applied head per object
+* whether that head is provisional or satisfies the module's finality predicate
 
 This is important for debugging workflow issues and explaining why some validly signed events did not become canonical state.
 
 ---
 
 # 17. Implementation Guidance
+
+The symbolic state-machine fixtures are in [RFC-0005 conformance vectors](vectors/rfc-0005.json). Implementations MUST produce the specified projection and event classifications for each fixture and every listed delivery permutation before claiming conformance. The suite is Draft; it does not establish module-specific authority policy.
 
 Implementations SHOULD keep separate stores or indexes for:
 
@@ -493,7 +496,7 @@ Because the project follows TDD, implementations of this RFC should begin with:
 
 * event ordering tests
 * pending-to-applied transition tests
-* deterministic conflict winner tests
+* conflict resolution and unresolved-branch conformance vectors
 * projection rebuild tests
 * duplicate envelope replay tests
 

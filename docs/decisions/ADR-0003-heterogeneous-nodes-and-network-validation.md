@@ -1,6 +1,6 @@
 # ADR-0003 - Heterogeneous Nodes and Network Validation
 
-**Status:** Proposed
+**Status:** Accepted direction; reference technology choices remain proposed
 **Date:** 2026-10-18
 **Decision Type:** Protocol Architecture
 **Amends:** ADR-0001 (desktop-first MVP), RFC-0002 §4.3
@@ -9,7 +9,7 @@
 
 ## Context
 
-ADR-0001 and RFC-0002 define a desktop full node as the only node type of the MVP and explicitly exclude mobile nodes and light clients.
+Earlier versions of ADR-0001 and RFC-0002 focused on a desktop full node as the only MVP node type and deferred mobile/light profiles. This ADR supersedes that full-node-only assumption while preserving desktop as the first implementation target; RFC-0002 now specifies the three profiles and their shared validation boundary.
 
 The target network is broader. It must run across the world, on:
 
@@ -39,7 +39,7 @@ A node measures its own resources (storage, memory, CPU, bandwidth, uptime, reac
 
 Service nodes are an optimisation, never an authority: anything they serve is signed by its author and verified by the receiver, and a light node queries several service nodes so that one cannot hide data.
 
-### 2. "The network validates everything" without a blockchain
+### 2. Protocol validation without a chain; treasury audit on Bitcoin
 
 Most Alkaest facts do not need global agreement. They need to be **authentic, ordered within their space and reproducible**:
 
@@ -50,13 +50,17 @@ Most Alkaest facts do not need global agreement. They need to be **authentic, or
 | Derived facts | Reputation, search ranking: recomputed from signed evidence with deterministic rules | Any node that wants to; results are verifiable, not trusted |
 | Global uniqueness / value | Things that cannot be double-spent (balances, escrow, names) | Deferred; anchored to an external settlement layer when needed (see ADR-0004) |
 
-Each space keeps a hash-linked, signed event log. Logs can be periodically **anchored** to Bitcoin (for example with OpenTimestamps) so that history cannot be rewritten later, without running a chain.
+Signatures authenticate the author but do not make payloads safe or true. Every node MUST validate field bounds, units, authority, state preconditions, and cross-field invariants before applying an event. Economic transitions require independent derivation from verified settlement facts and atomic application; malformed inputs fail without partial state changes. RFC-0014 defines treasury-specific requirements.
 
-This avoids building a blockchain, which would force every node, including phones, to agree on every fact in the world.
+Each space keeps a hash-linked, signed event log. The Alkaest protocol does not use a blockchain as its consensus or state-validation mechanism. For treasury and settlement, however, ADR-0007 requires Bitcoin transactions and periodic commitments to the signed treasury/workflow log. This gives public evidence of funds moved and log commitments without making every node agree on every fact in the world.
+
+This avoids building a custom Alkaest blockchain, which would force every node, including phones, to agree on every fact in the world.
 
 ### 3. Privacy by architecture
 
 Personal data stays on the node that owns it. The network carries signed, pseudonymous facts: provider listings are public business data; customers appear as per-space pseudonyms; queries can be routed through relays or Tor so that searching does not reveal who searches.
+
+Future mobile evidence capture does not make device sensors protocol truth. Photos, precise coordinates, and location metadata remain off-chain and access-controlled; the protocol records what source produced an evidence claim and which policy accepted it. Commodity-device location signals may be spoofed, so location assurance requires task-specific, risk-based corroboration and a dispute path. See the [mobile evidence and location research](../research/mobile-work-evidence-and-location-assurance.md).
 
 ### 4. MVP scope
 
@@ -81,12 +85,12 @@ Positive:
 
 * The same network works for a barber's phone, a home mini PC and a data-center server.
 * Trust does not depend on big nodes; they only make the network faster.
-* No blockchain to bootstrap, secure or pay for before there is a reason to move value.
+* No custom blockchain is needed for protocol validation. Bitcoin adds cost and operational dependencies only to treasury functions that actually move value.
 
 Negative:
 
 * Partial replication and multi-source queries are harder to build than "everyone stores everything".
-* Sybil resistance (fake identities inflating reputation) is not solved by signatures alone; it must be addressed in the reputation RFC (RFC-0006), for example by weighting evidence by the counterparty's own history and age.
+* Sybil resistance (fake identities inflating reputation) is not solved by signatures alone. RFC-0006 must address evidence independence, self-dealing, collusion, and privacy tradeoffs before reputation affects consequential outcomes; identity age or counterparty history alone is not proof of independence.
 * A Rust node core means the Java chatbot integrates through an API, not by sharing code.
 
 ---
@@ -94,5 +98,5 @@ Negative:
 ## Follow-up
 
 * Update RFC-0002 with node profiles and capability advertisement (done alongside this ADR).
-* RFC-0006 (reputation proofs) must define verifiable recomputation and Sybil weighting.
+* RFC-0006 (reputation proofs) must define verifiable recomputation and anti-manipulation controls before consequential reputation use.
 * RFC-0009 (node API) must expose partial replication and capability queries.

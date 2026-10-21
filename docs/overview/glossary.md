@@ -3,12 +3,12 @@
 ## Node
 
 The runtime that executes the Alkaest protocol.
-In the MVP, a node is a local full node run by a developer on their own machine.
+The first implementation target is a local Standard node. The architecture supports Light, Standard, and Service profiles; storage and service capacity differ by profile, but a profile does not grant extra protocol authority (RFC-0002, ADR-0003).
 
 ## Identity
 
 A cryptographic participant in the protocol.
-Identities sign protocol actions and accumulate reputation over time.
+Identities sign protocol actions and may accumulate contribution evidence over time. Reputation remains a derived, gated interpretation of that evidence (RFC-0006).
 
 ## Multiple Identities Per Node
 
@@ -52,12 +52,11 @@ It carries metadata, payload integrity information, and signatures.
 ## Task
 
 A conceptual unit of work coordinated through Alkaest.
-In later module RFCs this will likely be represented by a specific object schema such as `WorkItem`.
+In the first domain, the Development Workflow Module represents a task as a `WorkItem` (RFC-0003).
 
 ## WorkItem
 
-The expected protocol object type for development workflow tasks in the first domain.
-This term belongs primarily to the workflow module layer rather than the minimal core.
+The protocol object for a development-workflow task. Its terms are frozen and its lifecycle is projected from signed events; funding, validation, acceptance, payout authorization, settlement, and reputation remain distinct (RFC-0003).
 
 ## Evidence
 
@@ -66,7 +65,7 @@ Examples may include commits, pull requests, CI results, artifacts, or external 
 
 ## Reputation
 
-A domain-aware trust signal derived from verifiable work history, outcomes, and other protocol evidence.
+A domain-aware trust signal derived from verifiable work history, outcomes, and other protocol evidence. Its production use is gated until RFC-0006 addresses self-dealing, Sybil/collusion risks, validation, appeals, and privacy.
 
 ## Reputation Profile
 
@@ -103,15 +102,13 @@ A participant or role responsible for resolving disputes when requester and work
 
 Node-local logic that connects external systems such as GitHub or CI providers to the protocol without making those systems authoritative.
 
-## Local Full Node
+## Standard Node
 
-The MVP node profile.
-It stores protocol state locally, exposes the node API, validates envelopes, updates projections, and synchronizes with peers.
+The first implementation target: a desktop/workstation node that stores full history for its participating Spaces and a configurable share of other data. It exposes the Local API, validates accepted records, updates projections, and synchronizes with peers (RFC-0002).
 
-## Light Client
+## Light Node
 
-A future node profile with partial storage or selective synchronization.
-This is intentionally out of MVP scope unless a later RFC brings it in.
+A node profile for phones and browsers that keeps its identities and Spaces and fetches other data on demand. It validates every record it accepts and may use relays for reachability. It is the second implementation target, not a separate trust class (RFC-0002, ADR-0003).
 
 ## Query Projection
 
@@ -138,8 +135,7 @@ This term belongs primarily to the marketplace and workflow layer.
 
 ## Reward Escrow
 
-Funds reserved for successful task completion.
-This is part of the planned settlement model and is not yet fully specified.
+Funds locked for a task's agreed payout or refund path. RFC-0008 drafts an on-chain BTC `regtest` profile; its script, keys, recovery, and production settlement rules remain unresolved, and no real-fund operation is authorized.
 
 ## Bond
 
@@ -148,4 +144,4 @@ This may apply to requesters, workers, validators, or mediators depending on fut
 
 ## Blockchain Anchoring
 
-An optional mechanism for recording hashes or checkpoints of protocol state on a blockchain for stronger auditability without storing all details on-chain.
+An external timestamp commitment that binds a digest of off-chain protocol records to a blockchain without storing those records on-chain. Alkaest requires Bitcoin settlement references and periodic treasury-log anchors for live treasury operation (ADR-0007); anchors are not used as general protocol consensus or state validation (ADR-0003).

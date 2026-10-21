@@ -27,7 +27,13 @@ flowchart LR
         DB --> AUD
     end
 
-    subgraph P3["Phase 3: WhatsApp Discovery Number"]
+    subgraph P3["Phase 3: Private Protocol Backend Pilot"]
+        BOTNODE["Chatbot -> Provider Node"]
+        TESTNET["Isolated Multi-Node Test Network"]
+        BOTNODE --> TESTNET
+    end
+
+    subgraph P4["Phase 4: WhatsApp Discovery Number"]
         USER["Person Searching"]
         DISC["Discovery Assistant"]
         MATCH["Service and Availability Match"]
@@ -36,11 +42,10 @@ flowchart LR
         EST --> MATCH
         PRO --> MATCH
         SVC --> MATCH
-        AUD --> MATCH
         DISC --> MATCH
     end
 
-    subgraph P4["Phase 4: Alkaest Protocol Mapping"]
+    subgraph P5["Protocol Objects And Evidence (Mapped In Phase 3)"]
         ID["Identity"]
         SPACE["Space"]
         OBJ["Object"]
@@ -58,7 +63,7 @@ flowchart LR
         OWNER --> DEC
     end
 
-    subgraph P5["Phase 5: Progressive Decentralization"]
+    subgraph P6["Progressive Decentralization"]
         NODE["Provider or Community Node"]
         NET["Alkaest Network"]
         REP["Portable Reputation"]
@@ -71,11 +76,16 @@ flowchart LR
         NODE --> NET
         NET --> REP
     end
+
+    AUD --> BOTNODE
+    TESTNET --> DISC
+    TESTNET --> MATCH
+    TESTNET --> EVD
 ```
 
 ## Notes
 
 This diagram shows product progression, not a commitment that all chatbot data becomes public protocol data.
 
-Appointment-derived records must be filtered through privacy, consent, and minimization rules before becoming network Evidence.
+The protocol backend is validated behind the existing chatbot before the discovery or reputation frontend is exposed. Appointment-derived records must be filtered through privacy, consent, provenance, and minimization rules before becoming network Evidence. Completion, customer feedback, and reputation are separate concepts.
 

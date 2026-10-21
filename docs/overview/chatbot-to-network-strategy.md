@@ -7,7 +7,7 @@ This document connects the Alkaest Chatbot business path with the long-term Alka
 The short version:
 
 ```text
-Alkaest Chatbot -> WhatsApp Discovery Number -> Alkaest Network
+Alkaest Chatbot -> Private Service-Network Backend Pilot -> Discovery Frontend -> Alkaest Network
 ```
 
 Alkaest Chatbot is the commercial wedge.
@@ -19,6 +19,7 @@ See also:
 
 The goal is not to make the protocol a scheduling chatbot.
 The goal is to use a real scheduling business to create revenue, operational experience, verified service history, and a first marketplace dataset that can later become protocol-native.
+Over a longer horizon, the product can grow into an opt-in operating layer for independent professionals and a set of reusable tools for self-governed open-source projects. The [roadmap](roadmap.md) separates those capabilities from the first chatbot launch.
 
 ---
 
@@ -38,10 +39,9 @@ The chatbot project provides that path because it can start as a useful centrali
 These businesses already use WhatsApp as their daily operating interface.
 The first product should meet them there instead of asking them to adopt a new app, dashboard, wallet, or protocol node.
 
-Once Alkaest Chatbot has a base of paying clients, the next product layer can be a public WhatsApp discovery number where people search for professionals already using the chatbot.
-That creates the first marketplace-like experience without requiring decentralization on day one.
+Once Alkaest Chatbot has a base of paying clients, first integrate the protocol behind the existing interface and validate provider-private service records on isolated nodes. The service network must be well tested before a protocol-facing discovery or reputation frontend is exposed. After that backend gate, a public WhatsApp discovery number can create the first marketplace-like experience without requiring providers to run nodes.
 
-After enough professionals, appointments, and reputation evidence exist, the system can progressively move parts of that coordination model into Alkaest protocol objects, events, identities, evidence, and reputation.
+Progressively move only proven coordination concepts into protocol objects, events, identities, and evidence. Do not treat service completion or a rating as mature reputation; RFC-0006's integrity, consent, and appeal requirements remain separate gates.
 
 ---
 
@@ -148,6 +148,8 @@ Phase 1 should optimize for:
 - operational runbooks
 - clear audit data
 - repeatable local sales
+- official WhatsApp Business Platform API for production messaging
+- usage metering and a clear monthly statement for each provider
 
 Phase 1 should not optimize for:
 
@@ -177,30 +179,9 @@ Important outputs:
 This data should stay practical first.
 It should also be shaped so it can later map to Alkaest protocol concepts.
 
-### Phase 3: WhatsApp Discovery Number
+### Phase 3: Protocol Backend Pilot Behind The Chatbot
 
-Create a public WhatsApp number for consumers to search for available professionals in the Alkaest Chatbot base.
-
-The discovery number should support:
-
-- natural language search
-- location-aware provider discovery
-- service matching
-- availability checks
-- routing to a provider
-- optional booking through the same conversation
-
-This phase introduces marketplace behavior, but it may still be centrally operated.
-
-The key protocol lesson is discovery:
-
-```text
-Customer demand -> service search -> provider availability -> booking intent -> outcome evidence
-```
-
-### Phase 4: Protocol Mapping
-
-Start representing proven chatbot concepts as Alkaest-compatible objects and events.
+Start representing proven chatbot concepts as Alkaest-compatible objects and events before exposing them through a protocol-facing frontend. The chatbot remains the user interface while a provider-authorized node records scheduling events in private Spaces and an isolated test network validates them. This backend-first step tests the actual network lifecycle before adding a new discovery or reputation interface.
 
 Possible mappings:
 
@@ -216,11 +197,33 @@ Possible mappings:
 | Calendar change | Evidence or external integration event |
 | Customer notification | Message |
 | Admin command | Decision or privileged Event |
-| Completed appointment | Evidence |
-| Provider reliability | Reputation evidence |
+| Provider-recorded completed appointment | Provider-authored service outcome evidence |
+| Optional customer rating | Separate customer-feedback evidence with explicit consent and source provenance |
+| Provider reliability | A later reputation interpretation of multiple eligible evidence items, gated by RFC-0006 |
 
-This does not require changing RFC-0001.
-It likely requires a future service workflow module RFC.
+These are different claims. A provider's `appointment.completed` event is evidence that the provider recorded completion; it does not prove by itself that useful work occurred. A star rating or comment is feedback, not proof of completion or merit. A WhatsApp reply relayed by the provider's integration is attributable to that integration/channel and is not a cryptographic signature by the customer's Alkaest identity. Where a customer has an Alkaest identity, direct signed feedback can carry stronger provenance, but it remains a subjective claim and still needs abuse controls.
+
+The customer-facing chatbot may offer a brief, optional feedback request after the service. Explain what will be stored and whether it may be used in provider reputation; declining or ignoring it must not affect service access. Free-text comments can contain personal or sensitive information, so they stay private to the provider's product records by default and are never copied to public/protocol records by default. Only a deliberately consented, minimized, policy-eligible feedback record can be considered for later portability. Do not ask for health details or publish customer comments as a reputation shortcut.
+
+#### Backend-first network gate
+
+Before a reputation or protocol frontend is introduced, the chatbot-to-node backend must pass the [network rollout plan's service-data gate](network-rollout-plan.md#service-domain-backend-gate). Use private provider Spaces and isolated test identities/nodes. Initially use synthetic records; real appointments or feedback may be used only with a clear provider/customer notice, an opt-in basis appropriate to the jurisdiction, data minimization, and a way to decline. Do not hide the collection or network use from participants even though the integration runs behind the existing chatbot interface.
+
+The gate proves deterministic scheduling state, valid signatures/authority, privacy boundaries, idempotent chatbot retries, recovery and multi-node replication, and accurate provenance labels. Passing it enables only the next private/consented pilot step. It does not turn ratings into mature reputation or authorize public discovery/ranking; RFC-0006's integrity launch gate still applies.
+
+### Phase 4: WhatsApp Discovery Number
+
+After the service-domain backend gate, create a public WhatsApp number for consumers to search for professionals in the Alkaest Chatbot base. The discovery number should support natural-language search, service matching, availability checks, routing to providers, and optional booking.
+
+This phase introduces marketplace behavior and may remain centrally operated. Initially, discovery results use service fit and availability; reputation-based ranking remains blocked until RFC-0006 passes its integrity launch gate.
+
+The key protocol lesson is discovery:
+
+```text
+Customer demand -> service search -> provider availability -> booking intent -> outcome evidence
+```
+
+This does not require changing RFC-0001. The service workflow is described in Draft RFC-0007; backend validation and privacy review must precede protocol-facing discovery or reputation screens.
 
 ### Phase 5: Progressive Decentralization
 
@@ -228,16 +231,27 @@ Move selected responsibilities from the centralized chatbot system into protocol
 
 Potential order:
 
-1. Export signed provider profiles and service catalogs.
-2. Issue portable evidence for completed appointments.
-3. Represent provider reputation as protocol evidence.
+1. Export provider-authorized profiles and service catalogs.
+2. Issue portable, provenance-labeled evidence for provider-recorded completed appointments.
+3. Accept optional customer feedback separately, with explicit consent and source strength recorded.
 4. Let providers control their own identity and service history.
 5. Let discovery read from protocol state instead of only the central database.
-6. Introduce provider-run or community-run nodes.
-7. Move settlement, validation, and dispute mechanisms into later protocol modules when needed.
+6. Represent provider reputation only after RFC-0006 defines integrity, privacy, challenge, and appeal rules.
+7. Introduce provider-run or community-run nodes.
+8. Move settlement, validation, and dispute mechanisms into later protocol modules when needed.
 
 Progressive decentralization should be earned by real use.
 Do not decentralize parts that have not been operationally proven.
+
+### Phase 6: Professional Tools And Project Spaces
+
+After the network has working provider and contributor flows, Alkaest may add an opt-in professional dashboard that connects open-source tools for scheduling, customer management, invoicing, bookkeeping, and reporting. Integrations remain replaceable, user-authorized, exportable, and outside protocol core. Reports begin with explainable historical facts; forecasts such as low-demand windows for a holiday are optional decision support with visible assumptions and uncertainty.
+
+In parallel, provide project onboarding templates so open-source projects can create their own Spaces, publish governance and budget policies, fund WorkItems, and rotate roles. These spaces can adopt DAO-like decision processes without a mandatory token, shared global treasury, or claim that protocol membership alone defines a legal DAO.
+
+Do not select a fixed set of tools or promise predictive business outcomes until provider interviews and a small pilot establish which data is available, useful, and safe to connect.
+
+The first tool comparison and pilot proposal are recorded in the [professional tools integration pilot](../research/professional-tools-integration-pilot.md). Dolibarr is only the first candidate to validate; this does not commit the product to that tool.
 
 ---
 
@@ -265,7 +279,7 @@ Instead, the core should continue to define generic primitives:
 - Decision
 - Envelope
 
-Service scheduling should live in a future domain module, similar to how open-source development is currently represented by RFC-0003.
+Service scheduling belongs in a domain module, not protocol core. It is currently described by Draft RFC-0007 and must be validated through the chatbot backend pilot before protocol-facing service screens are introduced.
 
 ### Treat Chatbot Records As Future Evidence
 
@@ -280,8 +294,7 @@ The chatbot should store enough operational history to become evidence later:
 - which admin command changed the schedule
 - which notification was sent
 
-Not all of this data should be public.
-Privacy and consent must be handled before exporting anything to a decentralized network.
+Not all of this data should be public. Appointment completion, customer feedback, and review text are separate records with different authors and evidentiary strength. Privacy and explicit notice/consent must be handled before any real customer-derived record is exported or replicated to a network.
 
 ### Preserve Provider Portability
 
@@ -300,15 +313,7 @@ Node operation can become relevant later for providers, operators, communities, 
 
 ## New RFC Direction
 
-The current RFC sequence can remain valid for the protocol foundation.
-
-Add a future module RFC:
-
-```text
-RFC-0006 or later: Service Scheduling Workflow Module
-```
-
-That RFC should define:
+The current RFC sequence remains valid for the protocol foundation. Draft RFC-0007 already describes the service scheduling module; its next revision should incorporate evidence from the backend pilot and retain clear boundaries for:
 
 - provider Spaces
 - professional Membership
@@ -322,9 +327,7 @@ That RFC should define:
 - reputation evidence boundaries
 - privacy rules for service records
 
-If RFC-0006 remains reserved for reputation proofs and scoring, the service scheduling module can become RFC-0007 or later.
-
-Update (2026-10): the module is specified as [RFC-0007 Service Scheduling Module](../rfc/0007-service-scheduling-module.md).
+The service module identifies source events only. RFC-0006 must separately specify how any evidence may contribute to reputation and what consent, independence, challenge, and appeal rules apply.
 
 ---
 
@@ -337,13 +340,21 @@ Recommended sequence:
 1. Make the first barber successful.
 2. Add one dentist or similar professional service.
 3. Standardize onboarding.
-4. Keep pricing simple in BRL.
+4. Keep usage pricing simple to understand in BRL: measured usage, separated cost components, estimates, alerts, and a customer-selected cap.
 5. Build reliability before broad growth.
 6. Use testimonials and referrals before paid traffic.
 7. Create the discovery number only after there are enough providers to make search useful.
 
 The discovery number should not launch too early.
 If there are too few providers, it will feel empty and damage trust.
+
+### Usage-Based Commercial Model
+
+Alkaest Chatbot should charge the service provider according to measured usage rather than relying on a fixed recurring subscription as the only price. The WhatsApp API bill varies with the applicable provider pricing rules, while Alkaest's own variable cost also changes with AI inference and other usage. Keep those cost sources visible as separate line items.
+
+The usage ledger should attribute provider-delivered messages, applicable Meta/provider charges, AI consumption, and relevant service actions to one business account and billing period. Count a WhatsApp message as a Meta pass-through cost only when the active Meta rules make that event billable; do not equate every inbound/outbound message with a Meta fee. Deduplicate webhook events and sending retries before calculating charges.
+
+Before a provider connects its number, show a usage estimate and explain which costs can vary. Let each provider set warning thresholds and a spending cap, then degrade optional automation safely at the cap with a clear human handoff. The exact Alkaest margin and whether WABAs are customer-owned or Alkaest-managed remain open until a cost model and pilot are complete. Recheck Meta's [official pricing page](https://whatsappbusiness.com/products/platform-pricing/) before launch because categories and rates can change.
 
 ---
 
@@ -379,10 +390,10 @@ Design reputation evidence around minimal proofs and consent.
 ### WhatsApp Provider Risk
 
 Risk:
-Baileys is unofficial and can create account/session instability.
+An unofficial integration or an undocumented provider surcharge can create account/session instability, customer billing disputes, and unexpected operating costs.
 
 Mitigation:
-Keep WhatsApp behind a messaging port and preserve a migration path to the official WhatsApp Business Platform.
+Use the official WhatsApp Business Platform API in production, keep it behind a messaging adapter, reconcile usage from provider delivery events, and show any intermediary/BSP fees separately.
 
 ### Protocol Scope Creep
 

@@ -22,9 +22,7 @@ The node is the primary execution boundary of the protocol. It is responsible fo
 * network synchronization
 * integration with external tools
 
-For the MVP, Alkaest assumes that each developer operates a **local full node**.
-This RFC does not require mobile-first operation or light-client behavior.
-Any reduced or embedded node profile is considered future work unless another RFC promotes it into scope.
+The first implementation target is a desktop **Standard node**, but the architecture MUST support heterogeneous Light, Standard, and Service profiles from the start, as required by ADR-0003. Profiles may differ in replication, storage, reachability, and offered services; they MUST use the same protocol validation rules for every record they accept. The Light profile is a future implementation target, not a reason to defer the architectural boundaries it requires.
 
 ---
 
@@ -44,7 +42,6 @@ This RFC does not define:
 * reputation algorithms
 * settlement or escrow mechanisms
 * GitHub-specific workflow behavior
-* light-client synchronization protocols
 
 Those concerns belong in later RFCs.
 
@@ -73,11 +70,11 @@ This RFC turns those assumptions into an implementation-aware architecture.
 
 # 4. MVP Node Model
 
-## 4.1 Full node by default
+## 4.1 Standard node as the first implementation target
 
-In the MVP, every Alkaest participant is expected to use a **full node** running locally on their desktop or workstation.
+The first implementation target is a **Standard node** running locally on a desktop or workstation. The MVP client and APIs MUST not assume that every participant runs a Standard node: a Light node may hold only its own identities and spaces and fetch other data on demand, while Service nodes may provide optional relay, archive, indexing, or mailbox roles.
 
-The full node stores and processes:
+The Standard node stores and processes:
 
 * local identities and signing keys
 * protocol envelopes relevant to synchronized spaces
@@ -86,7 +83,7 @@ The full node stores and processes:
 * attachment references
 * mailbox messages addressed to local identities
 
-The full node also exposes a local API for user interfaces, automation, and integrations.
+The Standard node also exposes a local API for user interfaces, automation, and integrations. The API boundary is shared across deployment profiles; profile-specific capabilities and unavailable data MUST be reported explicitly.
 
 ## 4.2 Local-first operation
 
@@ -102,18 +99,15 @@ flowchart LR
 Applications do not implement protocol logic directly.
 They delegate protocol actions to the local node.
 
-## 4.3 No light-client requirements in MVP
+## 4.3 First implementation scope and profile requirements
 
-The MVP does not require:
+The first implementation does not have to deliver a production Light-node client. The architecture and protocol contracts MUST still support:
 
-* mobile-embedded nodes
-* selective sync profiles
-* partial trust replication
-* remote custodial node operation
+* partial replication and on-demand retrieval by Light nodes;
+* capability advertisement and profile-aware API responses; and
+* operation through relays when a Light node is not publicly reachable.
 
-These may be introduced later, but they are not architectural requirements for the first implementation.
-
-> **Amended by ADR-0003 (2026-10-18):** the first *implementation* remains a desktop Standard node, but the *architecture* must support heterogeneous nodes (phones, weak machines, servers) from the start. See §16 Node Profiles. Partial replication and capability advertisement are architectural requirements; the Light profile is the second implementation target.
+The first implementation target remains a desktop Standard node; the Light profile is the second implementation target. Nodes do not trust a peer's profile label or capability claims as proof of data validity. Every accepted record is validated under the same protocol rules, and replicated state is replayed locally as required by RFC-0005. See ADR-0003 and §16.
 
 ---
 
@@ -179,17 +173,11 @@ The node accepts commands from applications and integrations, validates local pr
 
 The node verifies every incoming or locally created envelope before it becomes part of local protocol state.
 
-Validation includes:
-
-* signature verification
-* payload hash verification
-* protocol version checks
-* schema checks
-* basic object-kind checks
+Validation MUST follow RFC-0004's ordered structural, canonical-byte, hash, identifier, author, signature, and schema checks, followed by RFC-0005 sequencing, permission, and module-transition checks. Implementations MUST finish validation before mutating durable protocol state. Acceptance of an envelope into the append-only record store and advancement of an object's projection MUST be atomic with respect to local failure: a failed write or projection transaction MUST leave neither a partial record nor a partially advanced head.
 
 ## 6.4 Event and object processing
 
-The node stores accepted protocol objects and events, then updates local read models and indexes.
+The node stores valid protocol objects and events, then rebuilds or advances local read models and indexes under RFC-0005. Local `applied` status is a revisable projection over the currently known event set, not global finality.
 
 ## 6.5 Storage
 
@@ -199,6 +187,16 @@ The node persists enough data to:
 * answer queries
 * recover after restart
 * resynchronize with peers
+
+### 6.5.1 Durable admission, projection commit, and rebuild
+
+An envelope MUST pass the applicable framing/resource limits and RFC-0004 validation before it enters the admitted protocol-record set. RFC-0005 then classifies its event against the complete locally known branch set. A valid event may be admitted as `pending` or `conflicting` without advancing the canonical object head; those are durable classifications, not partial application.
+
+Admission of a valid envelope, its event classification, and any resulting projection/head change MUST be one recoverable local commit. When the record store and projection share a transactional store, commit them in one transaction. When they do not, use a durable write-ahead/admission record and a committed projection cursor or generation so restart can deterministically finish or retry projection before exposing the new head. Do not publish sync inventory, emit success notifications, or trigger external effects until the admission commit is durable. Duplicate `envelopeId` delivery is idempotent.
+
+A rejected event MUST NOT advance protocol state. If retained for audit or diagnostics, it MUST be stored in a bounded quarantine/diagnostic path that is distinct from the admitted event log and cannot be replayed as valid protocol history. A crash before commit leaves no admitted transition; a crash after commit preserves the admitted record and allows projection recovery from it.
+
+Projection rebuild MUST read only the admitted immutable records and the versioned protocol/module rules they reference, compute a complete replacement generation, and atomically switch the active generation after successful completion. A failed rebuild leaves the prior generation visible and retryable; partial indexes or a partially advanced head MUST never be exposed. Nodes MUST be able to verify the new generation by replaying the same admitted record set. These commit and rebuild rules apply to every profile; lower local resource caps may defer work but cannot alter the replay result.
 
 ## 6.6 P2P synchronization
 
@@ -507,21 +505,15 @@ The following are intentionally out of MVP scope:
 * multi-tenant hosted node architecture
 * specialized validator-only node roles
 
-These may be introduced by later RFCs once the full-node desktop-first architecture is stable.
+These may be introduced by later RFCs once the profile-independent protocol and node boundaries are stable. Partial replication and capability advertisement are already architectural requirements under ADR-0003 and §16.
 
 ---
 
 # 15. Summary
 
-For the MVP, Alkaest should be built around a local full node operated by each developer.
-The node is the protocol boundary, the storage boundary, and the trust boundary for client applications and integrations.
+The first implementation is a local Standard node, operated by a developer on a desktop-class machine. The node remains the protocol boundary and the trust boundary for client applications and integrations. Storage is profile-dependent; a Light node is not required to retain or serve the full history of its spaces, and a Service node gains no protocol authority by storing or serving more data.
 
-This architecture preserves the node-first model established in RFC-0001 while keeping the MVP focused on:
-
-* desktop-first operation
-* open-source development coordination
-* protocol correctness
-* future extensibility without present-day light-client complexity
+This architecture preserves the node-first model established in RFC-0001 while keeping the MVP focused on desktop-first open-source development coordination. Implementations MUST preserve the profile-independent protocol rules and component boundaries in §16 so Light and Service implementations do not require a protocol redesign.
 
 ---
 
@@ -548,3 +540,13 @@ No profile is trusted more than another. Data served by a Service node is accept
 * **P2P Sync Engine (§7.8):** partial replication, multi-source fetching, relay usage for unreachable peers.
 * **Storage Engine (§7.7):** storage budgets and eviction for replicas the node does not own.
 * **API Server (§7.1):** capability and replication-status queries.
+
+## 16.5 Resource-bound processing
+
+The protocol resource model uses hard limits by data class, with transport negotiation permitted only to select a smaller transfer unit. This adopts the class-based model with capability-aware chunking (B+C in the [resource-bound options analysis](../research/bisq2-resource-bounds-and-dispute-authority.md)); peer-advertised capacity MUST NOT raise a protocol maximum. Each implementation MAY enforce lower local caps and MUST expose a clear retry/defer result when those caps prevent processing a valid record.
+
+Before an envelope or batch can consume unbounded resources, implementations MUST enforce independent bounds for encoded and decoded bytes, JSON depth and member counts, string and array lengths, signatures, batch item count, decompression ratio, concurrent work, processing deadline, and replay work. Attachment bytes MUST remain outside signed event payloads and transfer in bounded, resumable chunks. Sync MUST be paged; a receiver MUST NOT allocate based on a peer's declared total size or item count. Expiring a cache or replica is allowed only where the data class permits it; signed state and evidence needed for replay, appeal, or settlement audit MUST NOT expire under a generic cache TTL.
+
+An over-limit or malformed record MUST be rejected before durable state mutation. A valid record deferred by a lower local cap MUST NOT be reclassified as protocol-invalid, and retrying it under a higher local cap MUST produce the same validation and projection result. Backpressure and local ingress quotas may reduce service availability, but MUST NOT change canonical event meaning or authority.
+
+This RFC does not yet assign numeric class ceilings. RFC-0004/RFC-0005 vectors, payload inventory, and the reproducible benchmark plan in ADR-0009 are prerequisites for selecting and versioning those values. The initial implementation MUST fail closed on resource exhaustion before committing protocol state.

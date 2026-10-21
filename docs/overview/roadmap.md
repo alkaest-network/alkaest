@@ -1,397 +1,126 @@
 # Roadmap
 
-## Purpose
+This roadmap separates what the repository already specifies from what remains a decision, draft, or launch prerequisite. It prioritizes protocol correctness and threat reduction before payment or reputation features can affect real users.
 
-This roadmap connects the current vision to an implementable protocol.
-It captures the main planning gaps, the recommended RFC sequence, and the founder-level decisions that still need to be made.
+## Current maturity
 
----
+Alkaest is currently a **documentation and architecture project** in this repository, which contains no protocol implementation. A prototype node (Phase 0 plus a signed Local API, device pairing and event streaming) exists in the separate private `alkaest-node` repository; it does not yet conform to the RFC-0004/0005 vectors, and conformance work is starting. The existing RFCs are drafts, not production guarantees. See the [documentation index](../README.md) and [current state](../handoff/current-state.md).
 
-## What is already defined
+### Defined directions
 
-### Strongest current material
+- Desktop-first implementation, with future heterogeneous-node support (ADR-0001, ADR-0003, ADR-0005).
+- Generic protocol core; open-source development is the first workflow domain (RFC-0001–0003).
+- Canonical envelope/identity direction and deterministic event processing are described in RFC-0004/0005. Both have been cross-reviewed and have drafted known-answer vectors, but the vectors have not yet been exercised by any implementation.
+- Bitcoin is the current settlement and treasury audit direction; no Alkaest chain (ADR-0004, ADR-0007).
+- The founder intends initial paid contributor WorkItems to settle in BTC through Alkaest; contributors may independently trade BTC for fiat through Bisq if they choose. Bisq is not an Alkaest payout processor and conversion/liquidity is not guaranteed. Draft RFC-0008 selects on-chain BTC in `regtest` for initial conformance and defers Lightning; production profile, quote denomination, destination proof, and fees remain open. See [Bitcoin payout research](../research/bitcoin-payouts-and-bisq-conversion.md).
+- Design token economics before launch, but do not issue, sell, list, or activate real-money token governance yet (ADR-0008).
+- Reputation remains non-transferable. Reputation that affects production authority, funding, governance, or consequential ranking is blocked until RFC-0006 resolves self-dealing, Sybil/collusion risks, appeals, and privacy tradeoffs.
+- A bounded treasury agent may perform routine work only under predeclared policy and evidence rules; autonomous mainnet treasury operation is not authorized (ADR-0007, RFC-0014).
+- The May 2026 Bisq v1 incident is a concrete security case for validating adversarial inputs before any economic state mutation.
+- Stronger hosts may contribute optional Service capacity without receiving extra protocol authority. [ADR-0009](../decisions/ADR-0009-resource-aware-capacity-and-deployment.md) defers Kubernetes until an operator has measured multi-host orchestration needs; representative resource benchmarks remain open.
 
-- Vision and principles in [vision.md](vision.md)
-- Shared terminology in [glossary.md](glossary.md)
-- Core protocol shell in [0001-protocol-core.md](../rfc/0001-protocol-core.md)
-- Desktop-first node architecture in [0002-node-architecture.md](../rfc/0002-node-architecture.md)
+### Draft specifications
 
-### Still mostly conceptual
+RFC-0001 through RFC-0005, RFC-0007 through RFC-0009, RFC-0013, and RFC-0014 exist as drafts. RFC-0008 and RFC-0013 remain settlement and dispute launch gates; their high-impact selection, escrow and settlement decisions are open. They require consistency and security review before implementation. RFC-0007 is a future service-domain module, not a core MVP blocker.
 
-- Reputation scoring and proof issuance
-- Marketplace workflow semantics
-- Service scheduling workflow semantics
-- Economic settlement and bonds
-- Validator and mediator incentives
-- AI-assisted task matching
-- donation-to-issue allocation for the first self-hosted project
+### Planned specifications not yet written
 
-### Not yet defined enough to build against
+- RFC-0006: reputation proofs, integrity, scoring and appeals.
+- RFC-0010 through RFC-0012: data availability/privacy, permissions/capabilities, and governance/versioning.
+- A future token design RFC, number to be assigned through the RFC process after ADR-0008 research/simulation.
 
-- canonical encoding and hash rules
-- deterministic event ordering and merge behavior
-- workflow object schemas
-- validation evidence model
-- node API contract
-- integration configuration
-- governance and versioning
+## Prioritized work
 
----
+### Initial candidate backlog — Professional identity and Flutter tasks
 
-## Main gaps
+The first candidate needs include hiring a professional brand/visual identity designer and bounded Flutter app work. The founder can seed priorities and budget boundaries, then the Brain should select which issue to open first and determine its BTC bounty from evidence, quotes/rate rules, and the verified treasury balance. This makes Alkaest its own first customer while letting the network's decision loop choose the actual order and allocation. Begin with a local/no-value or Bitcoin `regtest` rehearsal. Real deposits and payouts remain blocked until wallet/key custody, treasury authority, escrow/refunds, settlement, disputes/appeals, and independent security review satisfy the launch gates for RFC-0003, RFC-0008, RFC-0013, and RFC-0014. Do not send funds to an unspecified or prototype wallet. The [current visual identity guide](../brand/visual-identity.md) is the creative brief; the reference boards are not final specifications or authority for product claims. Apply the [Bisq comparison](../research/bisq-compensation-and-bisq2-protocol-patterns.md) with care: Bisq DAO compensation is retrospective and should not be mistaken for this pre-funded bounty model. See the [next-tasks list](../handoff/next-tasks.md#immediate-priority--define-brain-led-task-selection-and-treasury-policy).
 
-### 1. Core protocol versus workflow boundary
+### P0 — Documentation and protocol consistency
 
-The project still needs a crisp line between:
+1. Cross-review the Draft RFC-0005 Space-local 2-of-3 resolver baseline and RFC-0002 class-based resource model in the [RFC-0001–0005 cross-review](../handoff/core-rfc-cross-review.md); run the [ADR-0009 benchmark plan](../decisions/ADR-0009-resource-aware-capacity-and-deployment.md) before choosing numeric limits.
+2. Review and exercise the Draft conformance vectors for canonical encoding, IDs, signatures, and event-state transitions in independent implementations before implementation claims conformance.
+3. Ensure every economic/authority-critical input is treated as untrusted, even when signed. Verify bounded integer units, per-class field/resource limits, cross-field invariants, atomic admission, and projection rebuild behavior. Benchmark representative Light/low-resource, Standard, and Service workloads before selecting numeric resource profiles (ADR-0009).
+4. Cross-review Draft RFC-0014 §10.1's role-separated pause/recovery model; choose its guardian quorums, deterministic expiry source and bounds, challenge window, and succession rules without creating unilateral fund-seizure or history-rewrite authority.
+5. Confirm the MVP deliverable and initial validation model (project-curated, qualified-open, or hybrid) before freezing implementation scope.
 
-- generic protocol primitives
-- open-source development workflow behavior
-- future marketplace and economic modules
+### P1 — Define the first self-hosted workflow safely
 
-Recommendation:
-Keep the core protocol generic and push workflow-specific behavior into module RFCs.
+1. Cross-review and complete RFC-0003 WorkItem lifecycle, role separation, project integration, task funding, evidence provenance, and conformance scenarios.
+2. Write RFC-0006 before any reputation score/proof can influence production access, material ranking, funding, governance, or treasury limits. Use the [reputation integrity threat model](../research/reputation-integrity-threat-model.md).
+3. Cross-review Draft RFC-0013 validator eligibility, disputes, mediation, appeals, and finality before implementing disputed-work automation.
+4. Cross-review Draft RFC-0008 settlement/escrow rules with RFC-0003/RFC-0013/RFC-0014; resolve the exact transaction, key, recovery, mediator and Bitcoin anchoring gates before implementation.
+5. Complete RFC-0014 event schemas, policy evaluation, independent provider attestations, integer bounds, key separation, emergency pause, and recovery. Include regression scenarios based on the [Bisq incident review](../research/bisq-may-2026-incident-and-alkaest-mitigations.md).
+6. Decide donation allocation, treasury limits, guardian quorum, reviewer classes, `.alkaest/project.yaml`, and which work can be paid or accepted autonomously.
+7. Define the contributor-facing paid-work pilot separately from long-term multi-project economics; disclose what is simulated, supervised, or operational.
+8. Cross-review the valueless [Alkaest paid work pilot](../research/alkaest-paid-work-pilot-design.md) rules in RFC-0003/RFC-0014 against event ordering, escrow, and dispute RFCs, informed by the [JHipster bounty model analysis](../research/jhipster-bounty-model.md). Demonstrate a concrete improvement before any real-money launch or external-project invitation.
 
-### 2. Envelope and encoding rules
+### P2 — Implement a no-value local prototype
 
-RFC-0001 defines the envelope concept, but the project still lacks exact rules for:
+A prototype local node already exists in the private `alkaest-node` repository, but it predates conformance with the Draft vectors. Only after P0 specifications stabilize, bring that node into conformance and implement the first workflow using simulated accounts and Bitcoin `regtest`. Test malicious modified clients, malformed-but-signed inputs, negative/overflow values, replay, inconsistent transaction outputs, conflicting event order, self-dealing, collusive review, duplicate work, and appeals. No production reputation weight, token, public sale, or mainnet treasury permissions in this phase.
 
-- canonical serialization
-- hashing
-- signatures
-- ID derivation
-- validation procedure
+### P3 — Multi-node and testnet validation
 
-Without this, implementations cannot converge reliably.
+Run independent nodes and verify byte-for-byte deterministic outcomes, treasury event commitments, recovery, and operational caps. Use `signet` for settlement/anchor experiments. Any token experiment must be valueless, non-transferable outside the test environment, and have no redemption or market promise.
 
-### 3. Event semantics and deterministic state
+### P4 — Product and network expansion
 
-The project needs explicit rules for:
+Use Alkaest Chatbot to validate provider workflows and service-domain privacy needs. The production channel is the official WhatsApp Business Platform API; launch the provider-facing usage ledger, cost estimates, billing statements, thresholds, and safe-cap behavior before onboarding paid production customers. RFC-0007 now exists as a Draft; the next service step is a private backend integration through provider Spaces and an isolated multi-node network, using synthetic data first. Pass the [service-domain backend gate](network-rollout-plan.md#service-domain-backend-gate) before adding protocol-facing discovery or reputation screens. Do not let customer data or scheduling assumptions leak into protocol core. Production reputation remains behind RFC-0006 launch gates.
 
-- valid event ordering
-- replay behavior
-- conflict handling
-- invalid transition handling
-- projection determinism
+Before onsite service work is used for paid-work or reputation decisions, design and test the [mobile evidence and location assurance model](../research/mobile-work-evidence-and-location-assurance.md). Phones are evidence-capture clients; GPS, a photo, or a vendor integrity verdict alone is never treated as proof of physical presence. Define task-specific evidence profiles, privacy/retention rules, corroboration, and an appeal path first.
 
-This is a protocol blocker for implementation.
+Grow work-market participation in steps:
 
-### 4. Workflow module definition
+1. **Coordinated demand:** let experienced operators and teams bring opportunities, turn them into scoped and funded WorkItems, and coordinate contributors. Record the scope, budget, roles, acceptance rules, and any subcontracted work before delivery begins.
+2. **Open discovery:** make eligible WorkItems discoverable through independent indexes and clients, with enough context for a person to judge fit without relying on a single operator's private account or ranking.
+3. **Direct participation:** make it practical for individual contributors to run or connect through an Alkaest client/node, find work, and claim or negotiate it directly under the project's policy.
+4. **Coexistence and portability:** retain a useful role for coordinators who add scoping, trust, or delivery capacity, while allowing contributors and projects to move their identities, evidence, and eligible records between clients and operators.
 
-The first domain is open-source development coordination, but the concrete workflow is still underspecified.
+These are adoption capabilities, not launch promises or fixed dates. Direct discovery must not imply that all demand is public, that work is automatically open to everyone, or that a protocol role determines employment status. Privacy, funding, selection rules, disputes, and jurisdiction-specific responsibilities remain explicit launch constraints.
 
-The system still needs a module RFC that defines:
+Expand from service coordination into a professional operating layer only after provider workflows and consent are proven:
 
-- task or `WorkItem` schemas
-- claiming or assignment behavior
-- evidence submission
-- validation checkpoints
-- project integration configuration
-- funding flows from donated money into issue-level work items
+1. **Connect, do not absorb:** integrate selected open-source scheduling, customer-management, invoicing, and bookkeeping tools through replaceable adapters. Give the professional control over scopes, permissions, export, and disconnect.
+2. **Explain the business:** provide reports from user-authorized operational data, with provenance, time ranges, and uncertainty visible. Start with descriptive history before forecasts or recommendations.
+3. **Support planning:** evaluate opt-in decision support such as identifying a lower-demand window for time off. Show the evidence and assumptions; the professional decides whether to act. Do not present an estimate as guaranteed income, financial advice, or an automatic action.
+4. **Onboard independent projects:** provide reusable setup and governance tooling for open-source projects to form their own Spaces, publish budgets and decision rules, coordinate funded WorkItems, and replace project roles. DAO-like governance is project-scoped and does not require an Alkaest token or a global treasury.
+5. **Grow a module ecosystem:** let projects and providers add, maintain, and replace integrations without giving an adapter authority over identity, project funds, or protocol state.
 
-The first reference workflow should be for Alkaest itself, with the `alkaest-network` project acting as the first project coordinated through the network.
+Choose specific open-source tools only after validating target-provider workflows, maintenance health, integration interfaces, data export, security posture, and deployment options. Alkaest should orchestrate interoperable tools rather than become a monolithic accounting or ERP system.
 
-### 5. Reputation model
+The initial research candidate is an optional, read-only Dolibarr connector in a multitenant product, described in the [professional tools integration pilot](../research/professional-tools-integration-pilot.md). Tenant isolation is required from the pilot onward and must be demonstrated across data, credentials, background work, reports, exports, and deletion. This is a validation target, not an adopted dependency: confirm provider demand, API permission granularity, and deployment burden before implementation.
 
-The vision depends on portable, evidence-based reputation, but the exact rules are still open:
+### Long-term concept — autonomous operations for physical assets
 
-- contribution proof schema
-- scoring model
-- decay model
-- domain boundaries
-- negative signals
-- anti-farming limits
+After the professional-tool layer, service marketplace, evidence, permissions, and dispute controls are mature, Alkaest could coordinate a managed rental property through replaceable home-automation and service-provider adapters. A bounded agent could handle routine bookings and approved cleaning or maintenance WorkItems under owner-defined, revocable policies. This remains a distant vision, not a committed roadmap phase. It requires explicit guest privacy/consent, tenant isolation, device security, auditable authority, spending and access limits, emergency handling, and human escalation for high-impact or out-of-policy actions. See [vision: autonomous operations for physical assets](vision.md#autonomous-operations-for-physical-assets).
 
-### 6. Settlement and trust layer
+## Decisions that must precede launch
 
-The broader concept includes escrow, bonds, validation, and dispute resolution, but these are not yet defined precisely enough to implement.
+### Before any paid work or real treasury
 
-### 7. Chatbot-to-network bridge
+- Accepted RFC-0003, RFC-0008, RFC-0013, and RFC-0014 behavior.
+- Exact budget/payout units, escrow terms, transaction verification, treasury reserve and operating caps.
+- Guardian quorum, key separation, pause scope, recovery drill, dispute/appeal process, security incident response.
+- Independent review of code, dependency, design, documentation, and operational changes by risk class.
+- Legal, tax, and accounting review for the actual jurisdictions and services.
 
-Alkaest Chatbot introduces a practical commercial wedge that is not yet represented in the protocol roadmap.
+### Before reputation affects consequential decisions
 
-The project needs to define how centralized chatbot records can later map into protocol-native concepts without making the core protocol scheduling-specific.
+- RFC-0006 specifies proof provenance, role separation, independent demand, validator diversity, anti-collusion and task-splitting rules, provisional maturity, revocation, appeals, privacy, domain boundaries, and influence caps.
+- Tests demonstrate that self-created tasks and related-identity activity do not automatically create mature reputation or authority.
+- Define how reputational evidence is shown without overstating identity uniqueness or certainty.
 
-Important bridge concepts:
+### Before token issuance or token governance
 
-- establishments as future Spaces
-- business owners and professionals as future Identities or Members
-- services as Objects
-- appointments as booking or WorkItem-like Objects
-- booking and cancellation changes as Events
-- admin commands as Decisions or privileged Events
-- completed appointments as Evidence
-- provider reliability as future reputation input
+- Identify a concrete protocol utility and exact rights; compare a BSQ-like design, existing alternative asset layers, and a no-transferable-token baseline.
+- Simulate multi-project treasury flows and governance capture, concentration, Sybil attacks, vote buying, quorum failure, key loss, and emergency issuance.
+- Decide whether governance, fees, project budgets, settlement, and incentives are separate assets/units.
+- Approve distribution, supply, issuance caps, upgrade rules, migration, and incident/sunset plan.
+- Obtain jurisdiction-specific legal, tax, and accounting opinions before any distribution, offer, listing, custody, or related service.
 
-This should become a future service scheduling workflow module after enough operational learning exists.
+## Scope discipline
 
-### 8. Security and trust assumptions
-
-The project still needs a more explicit treatment of:
-
-- sybil resistance
-- colluding validators
-- spam and griefing
-- malicious evidence submission
-- replay and signature abuse
-- mailbox abuse
-- appointment privacy and consent for service-domain evidence
-
-### 9. Future node profiles
-
-> Update 2026-10-18: node profiles (Light, Standard, Service) are now an architectural requirement; see ADR-0003 and RFC-0002 §16. The rollout from one local node to a global testnet is in `network-rollout-plan.md`.
-
-The MVP is full-node-first, but the longer-term architecture still needs a place for:
-
-- light clients
-- selective sync
-- embedded or mobile nodes
-- trust assumptions for partial replication
-
-This should remain future work until the full-node model is stable.
-
-### 10. Node API and integrations
-
-The node-first model is established, but the practical interface still needs:
-
-- command definitions
-- query contracts
-- stream semantics
-- local auth rules
-- integration configuration shape
-
----
-
-## Recommended RFC sequence
-
-### Phase 1: Stabilize the protocol foundation
-
-#### RFC-0003: Development Workflow Module
-
-Define:
-
-- `WorkItem` lifecycle
-- evidence attachment points
-- project integration expectations
-- GitHub mapping boundaries
-- first practical workflow for open-source development
-- how donations to Alkaest become funded issues for Alkaest contributors
-
-Why now:
-It is the first real domain and the next planned RFC in the current repo process.
-
-#### RFC-0004: Envelope, Canonical Encoding, and Object IDs
-
-Define:
-
-- canonical serialization
-- hash rules
-- signature rules
-- object and envelope ID derivation
-- envelope validation flow
-
-Why now:
-Everything replicated on the network depends on deterministic encoding.
-
-#### RFC-0005: Object/Event Semantics and State Resolution
-
-Define:
-
-- event ordering
-- object versioning
-- replay rules
-- deterministic projections
-- invalid-state handling
-
-Why now:
-Nodes need consistent state convergence before implementation gets too deep.
-
-### Phase 2: Define the trust and market layer
-
-#### RFC-0006: Reputation Proofs and Scoring
-
-Define:
-
-- contribution proof schema
-- domain scoring
-- decay
-- negative signals
-- anti-farming rules
-
-#### RFC-0013: Validation and Dispute Resolution
-
-(Renumbered from RFC-0007, which now holds the Service Scheduling Module.)
-
-ADR-0006 makes this RFC the home of task mediation: random, verifiable mediator draws from a bonded pool, verdicts on proof of work, appeals to a panel, and mediator fees.
-
-Define:
-
-- validator eligibility
-- validation evidence
-- dispute triggers
-- mediator selection
-- finality
-
-#### RFC-0008: Escrow, Bonds, and Settlement
-
-Define:
-
-- reward escrow
-- bond rules
-- fee routing
-- payout outcomes
-- slash conditions
-
-#### Future RFC: Service Scheduling Workflow Module
-
-Define:
-
-- provider spaces
-- professional membership
-- service catalog objects
-- appointment or booking lifecycle
-- customer and provider messages
-- admin decisions
-- appointment completion evidence
-- cancellation and no-show evidence
-- privacy boundaries for appointment-derived records
-- mapping from Alkaest Chatbot records into protocol objects and events
-
-Why later:
-The chatbot should first prove the operational workflow with real clients.
-The protocol should standardize durable concepts after the product has evidence, not before.
-
-### Phase 3: Make the ecosystem usable
-
-#### RFC-0009: Node API and SDK Contract
-
-Define:
-
-- commands
-- queries
-- streams
-- auth model
-- error model
-- idempotency expectations
-
-#### RFC-0010: Attachments, Privacy, and Data Availability
-
-Define:
-
-- blob storage expectations
-- encryption boundaries
-- integrity guarantees
-- retention
-
-#### RFC-0011: Permissions and Capability Model
-
-Define:
-
-- space-level permissions
-- module-specific capabilities
-- role interpretation rules
-
-#### RFC-0012: Governance and Versioning
-
-Define:
-
-- protocol upgrade process
-- schema evolution strategy
-- standard module process
-- RFC acceptance expectations
-
----
-
-## Decisions that still need explicit answers
-
-### What is the practical MVP deliverable?
-
-The project should make this explicit:
-
-- a protocol plus reference node
-- a developer workflow app backed by the node
-- a project coordination system for open-source maintainers
-- a self-hosted coordination flow for the Alkaest project itself
-
-Recommendation:
-Pick one crisp MVP outcome and use it to evaluate every RFC.
-
-### What is the first settlement model?
-
-The current concept mentions crypto payments and escrow, but the first implementation still needs a simpler decision:
-
-- manual settlement
-- signed off-protocol settlement records
-- escrow-ready protocol records without on-chain execution
-- full on-chain settlement
-
-This should be decided in the context of the first real funding flow:
-donations to Alkaest being allocated across `alkaest-network` issues and paid out to Alkaest contributors.
-
-### How open is the first validation model?
-
-The project still needs to decide whether MVP validation is:
-
-- project-declared and curated
-- open to any qualified participant
-- hybrid
-
-### How much protocol responsibility should AI agents have?
-
-Recommendation:
-Keep agents advisory and node-local first.
-Do not treat them as separate trust roots in the MVP.
-
-### How does Alkaest Chatbot influence the protocol roadmap?
-
-Recommendation:
-Treat Alkaest Chatbot as a commercial bootstrap product and future domain-learning source.
-Do not let WhatsApp, Baileys, Google Calendar, or appointment scheduling leak into the protocol core.
-
-The protocol should later define service scheduling through a module RFC once the chatbot has proven:
-
-- provider profile requirements
-- service catalog requirements
-- booking lifecycle requirements
-- privacy constraints
-- useful reputation evidence
-- discovery behavior through the WhatsApp admin number
-
-### Will identity assurance be part of the first workflow?
-
-The long-term concept includes optional assurance tiers, but the MVP still needs a simpler answer:
-
-- no assurance layer initially
-- project-defined optional assurance metadata
-- first-class assurance requirements in the workflow module
-
-### Should blockchain anchoring exist in the first protocol versions?
-
-The concept is compatible with future anchoring, but the project still needs to decide whether early RFCs should:
-
-- ignore anchoring completely
-- reserve fields for future anchoring
-- define checkpoint structures early without requiring implementation
-
----
-
-## Immediate next work
-
-1. Refine RFC-0005 against RFC-0001 through RFC-0004.
-2. Define how donations to Alkaest are represented and allocated to `alkaest-network` issues.
-3. Define `.alkaest/project.yaml` for project integration.
-4. Write RFC-0006 Reputation Proofs and Scoring.
-5. Map Alkaest Chatbot records to future protocol Evidence and service scheduling objects.
-6. Add more diagrams for workflow state, evidence flow, funding flow, validation flow, and chatbot-to-network progression.
-
----
-
-## Exit criteria for planning maturity
-
-Planning is likely strong enough to support serious implementation when these are all true:
-
-- workflow objects and transitions are explicit
-- envelopes are deterministic
-- state convergence rules are explicit
-- evidence and validation are machine-readable
-- settlement outcomes are representable
-- node API contracts are stable enough for one client implementation
+- Do not build a custom chain for ordinary Alkaest event validation.
+- Do not use a transferable token as reputation or treat paid tasks as proof of merit by themselves.
+- Do not let GitHub, CI, an indexer, or an AI model become the protocol authority.
+- Keep chatbot/WhatsApp details in integrations and service modules.
+- Do not increase treasury, token, or reputation authority merely to meet a roadmap date; advance phases only when their exit criteria are evidenced.

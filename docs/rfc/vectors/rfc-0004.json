@@ -1,0 +1,99 @@
+{
+  "suite": "Alkaest RFC-0004 conformance vectors",
+  "suiteVersion": 1,
+  "status": "Draft",
+  "encoding": "UTF-8 JSON",
+  "notes": [
+    "These are known-answer fixtures for primitive protocol encoding and cryptography; domain-schema acceptance is a separate check.",
+    "The Ed25519 private seed is a published test key and MUST NEVER be used outside conformance testing.",
+    "Hex strings are lowercase. Base64url strings are unpadded."
+  ],
+  "canonicalization": [
+    {
+      "id": "jcs-rfc8785-number-string-literals",
+      "inputJson": "{\"numbers\":[333333333.33333329,1E30,4.50,2e-3,0.000000000000000000000000001],\"string\":\"\\u20ac$\\u000f\\u000aA'\\u0042\\u0022\\u005c\\\\\\\"\\/\",\"literals\":[null,true,false]}",
+      "expectedCanonicalUtf8": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"string\":\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\"}",
+      "expectedSha256": "2d5e01a318d0f0879ab568c4be289c8b1f64ef8921a53c6277d5e069978baacb"
+    },
+    {
+      "id": "jcs-rfc8785-property-sort-utf16",
+      "inputJson": "{\"€\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\ufb33\":\"Hebrew Letter Dalet With Dagesh\",\"1\":\"One\",\"😀\":\"Emoji: Grinning Face\",\"\u0080\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\"}",
+      "expectedPropertyOrder": ["\\r", "1", "\u0080", "ö", "€", "😀", "\ufb33"]
+    },
+    {
+      "id": "reject-duplicate-property",
+      "inputJson": "{\"a\":1,\"a\":2}",
+      "expected": "reject-before-signature-or-state-processing"
+    },
+    {
+      "id": "reject-lone-surrogate",
+      "inputJson": "{\"x\":\"\\ud800\"}",
+      "expected": "reject-invalid-unicode"
+    },
+    {
+      "id": "jcs-negative-zero",
+      "inputJson": "{\"negativeZero\":-0.0}",
+      "expectedCanonicalUtf8": "{\"negativeZero\":0}",
+      "expectedSha256": "4b56f0ef8f7c714c60f377637eec1bcf07aabf03fd7bf20ea5ea57688b9fac18"
+    },
+    {
+      "id": "reject-non-finite-binary64-number",
+      "inputJson": "{\"value\":1e400}",
+      "expected": "reject-non-finite-number-before-signature-or-state-processing"
+    },
+    {
+      "id": "reject-unsafe-integer-amount-number",
+      "inputJson": "{\"amountSats\":9007199254740993}",
+      "expected": "reject-schema-unsafe-integer-number-use-decimal-string"
+    }
+  ],
+  "ed25519": {
+    "source": "RFC 8032, test vector 1 (https://www.rfc-editor.org/rfc/rfc8032.html)",
+    "privateSeedHex_testOnly": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+    "publicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+    "publicKeyBase64url": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+    "messageHex": "",
+    "signatureHex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b",
+    "signatureBase64url": "5VZDAMNgrHKQhuLMgG6CioSHfx645dl02HPgZSJJAVVfuIIVkKM7rMYeOXAc-bRr0lv18FlbviRlUUFDjnoQCw",
+    "verify": true
+  },
+  "identifiers": [
+    {
+      "id": "identity-id-domain-separated",
+      "prefix": "idn_",
+      "domain": "alkaest:id:v1:identity",
+      "preimageHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+      "expectedId": "idn_7cb6d6bc088c7a4412d94ef58ad0def195249f341448817d54456b74d9073f66"
+    },
+    {
+      "id": "object-id-domain-separated",
+      "prefix": "obj_",
+      "domain": "alkaest:id:v1:object",
+      "canonicalPreimageUtf8": "{\"objectType\":\"work_item\",\"schemaId\":\"alkaest.workflow.work_item.v1\",\"spaceId\":\"spc_example\"}",
+      "expectedId": "obj_5a31e03bf3af8888fa53388eea682998edb5905b93e1172407d273200fce6d24"
+    },
+    {
+      "id": "event-id-domain-separated",
+      "prefix": "evt_",
+      "domain": "alkaest:id:v1:event",
+      "canonicalPreimageUtf8": "{\"actorIdentityId\":\"idn_7cb6d6bc088c7a4412d94ef58ad0def195249f341448817d54456b74d9073f66\",\"createdAt\":\"2026-01-01T00:00:00Z\",\"eventType\":\"work_item.opened\",\"prevEventId\":null,\"targetObjectId\":\"obj_5a31e03bf3af8888fa53388eea682998edb5905b93e1172407d273200fce6d24\",\"targetVersion\":1}",
+      "expectedId": "evt_f6bd9f343da372aad930a1d9aa8c5cbafeb25456ace362cd6f969659ed4f1d94"
+    }
+  ],
+  "envelope": {
+    "payloadCanonicalUtf8": "{\"objectType\":\"work_item\",\"schemaId\":\"alkaest.workflow.work_item.v1\",\"spaceId\":\"spc_example\"}",
+    "payloadBytesBase64url": "eyJvYmplY3RUeXBlIjoid29ya19pdGVtIiwic2NoZW1hSWQiOiJhbGthZXN0LndvcmtmbG93LndvcmtfaXRlbS52MSIsInNwYWNlSWQiOiJzcGNfZXhhbXBsZSJ9",
+    "payloadHashSha256": "3980afac432a770b3a8ca2b59e67a74affd2cd9431fd233c8734ebc69424bd22",
+    "signingPayloadCanonicalUtf8": "{\"authorId\":\"idn_7cb6d6bc088c7a4412d94ef58ad0def195249f341448817d54456b74d9073f66\",\"createdAt\":\"2026-01-01T00:00:00Z\",\"objectId\":\"obj_5a31e03bf3af8888fa53388eea682998edb5905b93e1172407d273200fce6d24\",\"objectKind\":\"object\",\"payloadHash\":\"3980afac432a770b3a8ca2b59e67a74affd2cd9431fd233c8734ebc69424bd22\",\"protocolVersion\":\"0.1\",\"spaceId\":\"spc_example\"}",
+    "envelopeId": "env_f903450cf3085b91e4681064a8314801ad55155aa0257726d77ffadcfe5e53d0",
+    "signatureHex_testOnly": "1e1d6f841ff9f57910ceef53beee8e94ef6cce659e015d6b1034dd36956fc96c5bda1a3d86f682b73dce2269282b03841e19b586b6aa982d114718d37d537904",
+    "signatureBase64url_testOnly": "Hh1vhB_59XkQzu9Tvu6OlO9szmWeAV1rEDTdNpVvyWxb2ho9hvaCtz3OImkoKwOEHhm1hraqmC0RRxjTfVN5BA"
+  },
+  "rejectBase64url": [
+    {"value": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo=", "reason": "padding-forbidden"},
+    {"value": "11qYAYKxCrfVS+7TyWQHOg7hcvPapiMlrwIaaPcHURo", "reason": "non-url-safe-character"},
+    {"value": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURp", "reason": "non-canonical-unused-pad-bits"},
+    {"value": "AA", "reason": "wrong-decoded-public-key-length"},
+    {"value": "AQ", "field": "signature", "reason": "wrong-decoded-signature-length"}
+  ]
+}

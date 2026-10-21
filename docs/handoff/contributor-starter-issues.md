@@ -38,5 +38,5 @@ These are proposed issue bodies for maintainers to review and publish on GitHub.
 
 - Confirm the RFC source sections still match these issue scopes.
 - Create the issue labels, or remove the suggested labels from the issue text.
-- Publish the issues after the contribution guide and issue forms are on the public default branch.
+- The contribution guide, Code of Conduct, security policy, and issue forms are already published on the default branch, so the issues can be opened once the checks above pass.
 - Leave the issues unassigned and explicitly state that they are unpaid documentation tasks.
