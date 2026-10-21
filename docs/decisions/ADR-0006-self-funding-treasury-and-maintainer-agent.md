@@ -158,7 +158,7 @@ The policy is a signed object in the `alkaest-network` space. The agent reads it
 | **A. Simulation (now)** | Agent planning, needs board, tasks, escrows and mediator draws, on Bitcoin `regtest`/`signet` with test repositories | Watches and tunes the agent |
 | **B. Supervised** | Real-money operation only after all launch gates; initial operation is human-supervised | Refills the allowance; approves out-of-policy needs; any mediation follows conflict rules |
 | **C. Open mediation** | Eligible participants can be drawn under RFC-0013; any reputation-based eligibility remains gated by RFC-0006 | Refills the allowance; changes the policy |
-| **D. Self-running** | Several maintainers co-sign the reserve and govern the policy by quorum (RFC-0012) | Governance only |
+| **D. Self-running** | Several maintainers co-sign the reserve and govern the policy by quorum (RFC-0012, planned, not yet written) | Governance only |
 
 **Phase A is simulation only.** The agent can plan, price, prioritize and publish a simulated needs board. Real-money operation waits for every launch gate in ADR-0007 and the roadmap, including accepted RFC-0008/0013/0014 behavior, adversarial testing, recovery drills, independent security review, and legal/accounting review.
 

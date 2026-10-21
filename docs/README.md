@@ -42,10 +42,14 @@ No document in this repository by itself authorizes real-money operation, token 
 
 Missing RFC numbers are intentional gaps, not specifications. Do not create numbered specifications by assuming an existing description is an accepted rule.
 
+## Architecture decisions
+
+- [Decision index](decisions/README.md) — status and open boundary of ADR-0001 through ADR-0009.
+- [ADR-0009 — Resource-Aware Node Capacity and Deployment](decisions/ADR-0009-resource-aware-capacity-and-deployment.md) — Proposed; no Kubernetes dependency in the protocol or MVP
+
 ## Overview and handoff
 
 - [Roadmap](overview/roadmap.md)
-- [ADR-0009 — Resource-Aware Node Capacity and Deployment](decisions/ADR-0009-resource-aware-capacity-and-deployment.md) — accepted direction; no Kubernetes dependency in the protocol or MVP
 - [Network rollout plan](overview/network-rollout-plan.md)
 - [Alkaest Search](overview/alkaest-search.md)
 - [Chatbot-to-Network strategy](overview/chatbot-to-network-strategy.md)

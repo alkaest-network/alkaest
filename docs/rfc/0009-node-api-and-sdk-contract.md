@@ -29,7 +29,7 @@ This draft covers version 1: authentication, device pairing, commands, queries, 
 ## Non-goals
 
 * Peer-to-peer synchronization between nodes (RFC-0002 §6.6). This RFC covers clients only.
-* Permission scopes per device or per identity (RFC-0011).
+* Permission scopes per device or per identity (RFC-0011, planned, not yet written).
 * Transport encryption. It is provided by TLS (§9).
 
 ---
@@ -101,7 +101,7 @@ Revoking a device removes its record. Its next request fails with `device_not_pa
 
 # 6. Resources
 
-A paired device may act as any identity held by the node (`as` field). Narrower grants belong to RFC-0011.
+A paired device may act as any identity held by the node (`as` field). Narrower grants belong to RFC-0011 (planned, not yet written).
 
 | Method and path | Request | Response |
 |---|---|---|
@@ -170,7 +170,7 @@ Errors use the body `{"error": {"code", "message"}}`.
 
 # 10. Open Questions
 
-* Per-device scopes and per-identity grants (RFC-0011).
+* Per-device scopes and per-identity grants (RFC-0011, planned, not yet written).
 * Pagination and filtering for `GET /v1/envelopes` and `GET /v1/state` once spaces grow.
 * Capability and replication-status queries for node profiles (RFC-0002 §16.4).
 * Reaching self-hosted nodes behind NAT (ADR-0005 open question; Phase 1).

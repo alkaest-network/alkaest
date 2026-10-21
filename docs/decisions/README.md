@@ -12,13 +12,13 @@ ADRs record the current Alkaest product and architecture decisions. Status is au
 | [0006](ADR-0006-self-funding-treasury-and-maintainer-agent.md) | Self-funding treasury, bounties, mediation, agent | Accepted direction | RFC-0008, RFC-0013, RFC-0014 must specify mechanisms and gates |
 | [0007](ADR-0007-autonomous-treasury-and-bitcoin-audit.md) | Policy-bounded autonomous treasury and Bitcoin audit | Accepted direction | RFC-0014 and RFC-0008 remain Draft; no mainnet authority |
 | [0008](ADR-0008-token-design-before-issuance.md) | Design token before considering issuance | Accepted direction | Purpose, rights, supply, chain, legal status, and launch remain open |
-| [0009](ADR-0009-resource-aware-capacity-and-deployment.md) | Resource-aware node capacity and deployment | Accepted direction | Defer Kubernetes until measured multi-host operations justify it; protocol resource profiles and benchmarks remain open |
+| [0009](ADR-0009-resource-aware-capacity-and-deployment.md) | Resource-aware node capacity and deployment | Proposed | Proposes deferring Kubernetes until measured multi-host operations justify it; protocol resource profiles and benchmarks remain open |
 
 ## Decision dependencies
 
 ```text
 ADR-0001 ──> ADR-0003 ──> RFC-0002
-ADR-0002 ──> RFC-0007 (future service module)
+ADR-0002 ──> RFC-0007 (Draft service scheduling module)
 ADR-0004 ──> RFC-0008 (settlement) ──> RFC-0014 (treasury operation)
 ADR-0006 ──> RFC-0013 (validation/disputes) ──> RFC-0003/RFC-0014
 ADR-0007 ──> RFC-0008 + RFC-0014

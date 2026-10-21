@@ -139,7 +139,7 @@ It adds a commercial bootstrap path alongside the protocol foundation:
 * RFC-0004 remains the canonical encoding and identifier specification.
 * RFC-0005 remains the object/event semantics and state resolution specification.
 
-A later RFC should define a Service Scheduling Workflow Module once the chatbot product has produced enough real operational learning.
+The Service Scheduling Workflow Module is now specified as Draft [RFC-0007](../rfc/0007-service-scheduling-module.md); it should be refined once the chatbot product has produced enough real operational learning.
 
 ---
 
@@ -161,7 +161,7 @@ Instead, it separates:
 
 Upcoming documentation should:
 
-* add a service scheduling module to the future RFC roadmap
+* add a service scheduling module to the RFC roadmap (done: Draft [RFC-0007](../rfc/0007-service-scheduling-module.md))
 * map chatbot concepts to Alkaest primitives
 * define privacy boundaries for appointment-derived evidence
 * keep the chatbot implementation test-first

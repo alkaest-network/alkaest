@@ -4,7 +4,7 @@
 **Author:** modern_alchemist
 **Date:** 2026
 **Category:** Module Specification
-**Related:** RFC-0001, RFC-0004, RFC-0005 §10, RFC-0006 (reputation), RFC-0009, ADR-0002, ADR-0005, `docs/overview/chatbot-to-network-strategy.md`
+**Related:** RFC-0001, RFC-0004, RFC-0005 §10, RFC-0006 (reputation; planned, not yet written), RFC-0009, ADR-0002, ADR-0005, `docs/overview/chatbot-to-network-strategy.md`
 
 Note on numbering: this number was reserved for "Validation and Dispute Resolution" in the roadmap. That RFC is now RFC-0013.
 
@@ -32,7 +32,7 @@ The module stays generic. It is not specific to WhatsApp, Google Calendar or bar
 
 * Reputation formulas (RFC-0006). This RFC only defines which facts reputation may consume (§10).
 * Payments, deposits and no-show fees (RFC-0008).
-* Fine-grained roles (RFC-0011). Until then, a schedule carries an explicit staff list (§5.2).
+* Fine-grained roles (RFC-0011, planned, not yet written). Until then, a schedule carries an explicit staff list (§5.2).
 * Shared resources (rooms, chairs, equipment) and appointments with several professionals (§12).
 
 ---
@@ -304,5 +304,5 @@ No-shows are recorded only by staff, never inferred.
 * Shared resources and multi-professional appointments: a `resource` schedule, plus an atomic booking across two objects.
 * Recurring appointments.
 * Deposits and no-show fees (RFC-0008).
-* Replacing `staff` lists with RFC-0011 capabilities.
+* Replacing `staff` lists with RFC-0011 capabilities (RFC-0011 is planned, not yet written).
 * Allowing a single appointment that crosses local midnight (night shifts).

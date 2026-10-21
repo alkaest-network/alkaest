@@ -3,7 +3,7 @@
 **Status:** Draft; no production or real-funds authorization  
 **Date:** 2026-10-19  
 **Category:** Work Validation and Conflict Resolution  
-**Related:** ADR-0006, ADR-0007, RFC-0003, RFC-0005, RFC-0006, RFC-0008, RFC-0014
+**Related:** ADR-0006, ADR-0007, RFC-0003, RFC-0005, RFC-0006 (planned, not yet written), RFC-0008, RFC-0014
 
 ## 1. Abstract
 
@@ -19,7 +19,7 @@ Goals:
 - Record role separation, conflicts, evidence references, policy versions, decisions, and corrections as replayable events.
 - Prevent self-review and self-mediation at the protocol-identity level, while stating the residual limits of pseudonymous Sybil detection.
 - Keep payment rights distinct from reputation credit or governance influence.
-- Provide a future conformance target that works with RFC-0003 WorkItems, RFC-0005 event resolution, RFC-0006 reputation proofs, RFC-0008 settlement, and RFC-0014 treasury authorization.
+- Provide a future conformance target that works with RFC-0003 WorkItems, RFC-0005 event resolution, RFC-0006 reputation proofs (planned, not yet written), RFC-0008 settlement, and RFC-0014 treasury authorization.
 
 Non-goals:
 

@@ -1,6 +1,6 @@
 # ADR-0009 — Resource-Aware Node Capacity and Deployment
 
-**Status:** Accepted direction; resource profiles and deployment thresholds remain open
+**Status:** Proposed; resource profiles and deployment thresholds remain open
 **Date:** 2026-10-19
 **Decision Type:** Node Architecture and Operations
 **Related:** ADR-0001, ADR-0003, ADR-0005, RFC-0002, RFC-0009, [Bisq 2 resource-bound options](../research/bisq2-resource-bounds-and-dispute-authority.md), [network rollout plan](../overview/network-rollout-plan.md)

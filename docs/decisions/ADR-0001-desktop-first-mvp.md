@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-03-16
 **Decision Type:** Product and Architecture
-**Amended by:** [ADR-0003](ADR-0003-heterogeneous-nodes-and-network-validation.md)
+**Amended by:** [ADR-0003](ADR-0003-heterogeneous-nodes-and-network-validation.md), [ADR-0005](ADR-0005-cross-platform-app-and-deployment-modes.md)
 
 ## Current interpretation
 
