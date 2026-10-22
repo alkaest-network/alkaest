@@ -18,7 +18,7 @@ It defines:
 * workflow-specific objects
 * workflow-specific events
 * the lifecycle of a `WorkItem`
-* the role of GitHub as an integration surface
+* the role of forges (Radicle as the canonical forge, GitHub as a mirror) as integration surfaces
 * the MVP funding flow for the first self-hosted project
 
 For the MVP, the first project expected to use this module is **Alkaest itself** through the `alkaest-network` project.
@@ -64,7 +64,7 @@ RFC-0001 defines the generic protocol primitives:
 RFC-0002 defines the MVP node architecture and establishes that:
 
 * the first implementation target is a desktop Standard node, while the architecture supports Light, Standard, and Service profiles
-* GitHub is an integration layer, not protocol authority
+* forges (Radicle, and the GitHub mirror) are integration layers, not protocol authority
 * the first project coordinated through the network is expected to be Alkaest itself
 
 This RFC defines the first practical workflow module that uses those protocol primitives.
@@ -247,7 +247,7 @@ WorkItem
 
 ### Notes
 
-- `externalIssueRef` may point to a GitHub issue.
+- `externalIssueRef` may point to a Radicle issue (canonical) or a GitHub mirror issue.
 - `bounty.amountSats` is an exact integer satoshi amount frozen before assignment; fiat estimates and AI-generated balances are not funding authority.
 - `feeBudgetSats` is separately disclosed and reserved; the signed terms state who bears any fee above the cap. Do not silently deduct fees from the contributor's frozen bounty.
 - The WorkItem's signed terms are immutable. Status fields are projections of validated events, not mutable signed fields.
@@ -476,7 +476,7 @@ flowchart LR
 
 ## 9.1 Issue identified
 
-A project issue exists, either natively in protocol planning or through GitHub integration.
+A project issue exists, either natively in protocol planning or as a Radicle issue (or a GitHub mirror issue during the transition, ADR-0010).
 
 ## 9.2 Candidate selected and funding proposed
 
@@ -656,20 +656,20 @@ When work is completed and validated, the workflow creates signed records needed
 
 ---
 
-# 12. GitHub Integration Boundary
+# 12. Forge Integration Boundary
 
-GitHub is a useful integration surface for the development workflow, but it is not protocol authority.
+The project's canonical source, its patches (pull requests) and its issues live on Radicle; GitHub is a read-mostly mirror (ADR-0010). Forges are useful integration surfaces for the development workflow, but they are not protocol authority.
 
-GitHub integrations MAY provide:
+Forge integrations (Radicle, and the GitHub mirror) MAY provide:
 
 * issue metadata
 * labels
-* pull request links
+* patch and pull request links
 * comments
 * review states
 * CI references
 
-GitHub integrations MUST NOT be treated as the sole source of truth for:
+Forge integrations MUST NOT be treated as the sole source of truth for:
 
 * assignment
 * protocol acceptance
@@ -677,7 +677,7 @@ GitHub integrations MUST NOT be treated as the sole source of truth for:
 * reputation effects
 
 Those outcomes must still be represented inside Alkaest protocol objects, events, or decisions.
-For funded code tasks, GitHub review and merge events are bound to immutable revisions and recorded as evidence. Payment requires the protocol's release decision and settlement record, not merely a green GitHub status.
+For funded code tasks, the reviewed work is a Radicle patch on the canonical repository. Evidence names the repository ID (RID), the patch ID, the reviewed patch revision and the commit a delegate merged into the canonical default branch. Review and merge events are bound to those immutable revisions and recorded as evidence. A pull request on the GitHub mirror becomes eligible only after a maintainer imports it as a signed Radicle patch. Payment requires the protocol's release decision and settlement record, not merely a merged patch or a green CI status.
 
 ---
 
@@ -796,7 +796,7 @@ The following constraints are intentional for the MVP:
 * the workflow is issue-centric
 * assignment is exclusive after acceptance
 * funding is authorized by a signed project policy; for Alkaest's first treasury workflow, the Brain ranks seeded candidates and a deterministic policy/balance gate authorizes each in-bounds allocation (RFC-0014)
-* GitHub remains an integration surface
+* Radicle is the canonical forge and GitHub a mirror; both remain integration surfaces (ADR-0010)
 * payout eligibility can be represented before settlement is enabled; real treasury payout follows ADR-0007/RFC-0014 and RFC-0008
 * the first reference project is Alkaest itself
 

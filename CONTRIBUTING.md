@@ -45,7 +45,7 @@ Useful contributions include:
 - improving accessibility, localization, privacy, and operational clarity in the public documentation
 - reporting reproducible bugs and asking focused questions
 
-The protocol is not tied to GitHub. GitHub is a collaboration and integration surface, not the source of protocol truth.
+The protocol is not tied to any forge. The canonical repository lives on [Radicle](https://radicle.dev), a peer-to-peer forge; GitHub is a mirror ([ADR-0010](docs/decisions/ADR-0010-decentralized-source-and-site-hosting.md)). Patches (Radicle's pull requests) are reviewed and merged on Radicle, and paid work is tied to Radicle patches. The Repository ID and seed address will be published here once the canonical repository is seeded; until then, contribute through GitHub as below, and maintainers will import accepted pull requests as Radicle patches.
 
 ## Before you start
 

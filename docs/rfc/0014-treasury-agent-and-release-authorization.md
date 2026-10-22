@@ -145,9 +145,9 @@ The assignment MUST also bind one assignee identity, a start-by deadline, a deli
 
 At least one required reviewer MUST be independent of the requester, funding authority, assignee, and known related identities; a risk policy MAY require a larger reviewer set. A conflict or unavailable reviewer blocks routine release and requires the declared escalation path. The payout recipient identity is bound by the accepted assignment. The payment destination MUST come from a contributor-signed settlement instruction and MUST be independently validated by RFC-0008 settlement rules; issue/PR content and model output can never select or alter it. An invalid or conflicting destination blocks payout.
 
-Evidence MUST identify immutable revisions or content digests, not only mutable URLs. For source-code work, evidence SHOULD include the patch/commit digest, pull request identity, merge commit, required independent approval identities, CI run identities and result digests, and any declared security checks. For visual-identity or other artifact work, evidence SHOULD include source files and a release artifact digest, preview/render evidence, and review decisions required by the WorkItem.
+Evidence MUST identify immutable revisions or content digests, not only mutable URLs. For source-code work, evidence SHOULD include the patch/commit digest, the Radicle repository ID, patch ID and reviewed revision (ADR-0010), merge commit, required independent approval identities, CI run identities and result digests, and any declared security checks. For visual-identity or other artifact work, evidence SHOULD include source files and a release artifact digest, preview/render evidence, and review decisions required by the WorkItem.
 
-Provider events from GitHub or CI are integration evidence. An adapter MUST sign the observation and bind it to the exact repository, commit, PR, workflow run, and provider identity. If the provider cannot produce a verifiable signature, the adapter's observation remains an attestation by that adapter and is labeled accordingly.
+Provider events from Radicle, the GitHub mirror or CI are integration evidence. An adapter MUST sign the observation and bind it to the exact repository, commit, patch or PR, workflow run, and provider identity. If the provider cannot produce a verifiable signature, the adapter's observation remains an attestation by that adapter and is labeled accordingly.
 
 ## 7. Planning, funding, and release state machine
 
@@ -293,7 +293,7 @@ No mainnet treasury operation is authorized by this draft alone. ADR-0007 and th
 ## 12. Open questions
 
 - Which Bitcoin commitment format and anchor cadence balance cost and auditability?
-- How are signed GitHub and CI adapter attestations issued, rotated, and independently checked?
+- How are signed Radicle, GitHub-mirror and CI adapter attestations issued, rotated, and independently checked?
 - Which review threshold is required for code, design, docs, and dependency changes?
 - How do policy updates and guardian quorums work in each deployment phase?
 - How are operating expenses paid and reconciled without creating a custodial hot wallet?
