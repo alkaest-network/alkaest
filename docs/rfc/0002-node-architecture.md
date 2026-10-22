@@ -208,6 +208,23 @@ The node communicates with peers to:
 * publish newly accepted envelopes
 * relay mailbox traffic
 
+### 6.6.1 Draft baseline: pull-based inventory sync
+
+This baseline is implemented for the Phase 1 simulation. It defines replication semantics, not a wire protocol; libp2p transport, discovery and push gossip will carry it later (ADR-0003).
+
+1. **Replication is per Space.** A node replicates a chosen set of Spaces and stores envelopes only for those Spaces (partial replication, §16.4).
+2. **Inventory.** A peer answers, for one Space, the ids of the envelopes it stores. An inventory is a claim, not evidence.
+3. **Fetch.** The node requests the ids it lacks, in bounded batches. Each id MUST have the exact `env_` format before the node uses it, and a peer MAY omit ids it cannot serve.
+4. **Admission.** Every fetched envelope goes through full envelope and payload validation (RFC-0004 §11) before it is stored. An envelope that fails validation, was not requested, or belongs to a different Space MUST be rejected. Nothing a peer says changes state except valid envelopes.
+5. **Convergence.** Projections are rebuilt from the stored envelopes (RFC-0005 §11), so nodes holding the same envelope set for a Space produce byte-identical Space state, whatever order the envelopes arrived in and whichever peer delivered them.
+6. **Duplicates and replays** are idempotent: an envelope already stored changes nothing.
+
+Open for the next drafts:
+- serving a private Space only to its members;
+- signed capability records and storage budgets (§16.2);
+- push announcements, efficient set reconciliation and relays for unreachable peers;
+- designating which provider node settles scheduling conflicts automatically. Two settling nodes sign competing resolutions, which fail closed (RFC-0007 §7).
+
 ## 6.7 Query serving
 
 The node exposes query interfaces for local applications and automation.
