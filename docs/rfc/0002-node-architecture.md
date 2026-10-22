@@ -224,6 +224,8 @@ This baseline is implemented for the Phase 1 simulation. It defines replication 
    - Announcements: one gossipsub topic per Space, `alkaest/space/<spaceId>/0.1`, signed with strict validation, carrying only the ids of newly stored envelopes. Receivers fetch them through the request-response protocol, so an announcement is never evidence.
    - Fallback: a periodic pull from connected peers.
    - Network key: separate from every protocol identity; it names the node on the network and carries no protocol authority.
+   - Relays: a node may offer the relay role (libp2p circuit relay v2). A node that opens no port, such as a phone, reserves a slot on a relay and is dialed through `/p2p-circuit`. A relay forwards encrypted streams only and stores nothing it does not itself replicate. Relaying grants no protocol authority (§16.3).
+   - Discovery: explicit peer addresses (hostnames allowed) and mDNS on a local network; wide-area discovery is still open.
 
 Open for the next drafts:
 - serving a private Space only to its members;
