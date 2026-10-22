@@ -1,6 +1,6 @@
 {
   "suite": "Alkaest RFC-0005 event-state conformance vectors",
-  "suiteVersion": 1,
+  "suiteVersion": 2,
   "status": "Draft",
   "fixtureModel": {
     "objectId": "obj_fixture",
@@ -12,7 +12,9 @@
       "R": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
       "R1": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
       "R2": {"kind": "authorized-resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": true},
-      "R_invalid": {"kind": "resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": false}
+      "R_invalid": {"kind": "resolution", "targetVersion": 1, "prevEventId": null, "resolves": ["A", "B"], "valid": false},
+      "C": {"kind": "ordinary-state-event", "targetVersion": 1, "prevEventId": null, "valid": true},
+      "R3": {"kind": "ordinary-state-event", "targetVersion": 2, "prevEventId": "R", "valid": true}
     },
     "symbolicIds": "A/B/R labels stand for distinct eventIds in this state-machine fixture; they are labels, not protocol wire IDs. Authorization and module-transition outcomes are supplied as fixture inputs."
   },
@@ -92,6 +94,17 @@
       "eventSet": ["A", "B", "A2"],
       "deliverPermutations": [["A", "B", "A2"], ["A2", "A", "B"], ["B", "A2", "A"]],
       "expectedForEveryPermutation": {"head": null, "version": 0, "state": {"A": "conflicting", "B": "conflicting", "A2": "pending"}}
+    },
+    {
+      "id": "late-competitor-after-resolution-loses",
+      "deliver": ["A", "B", "R", "R3", "C"],
+      "expected": {"head": "R3", "version": 2, "state": {"A": "conflicting", "B": "conflicting", "C": "conflicting", "R": "applied", "R3": "applied"}}
+    },
+    {
+      "id": "late-competitor-is-arrival-order-independent",
+      "eventSet": ["A", "B", "C", "R", "R3"],
+      "deliverPermutations": [["A", "B", "R", "R3", "C"], ["C", "R3", "R", "B", "A"], ["R", "C", "A", "R3", "B"]],
+      "expectedForEveryPermutation": {"head": "R3", "version": 2, "state": {"A": "conflicting", "B": "conflicting", "C": "conflicting", "R": "applied", "R3": "applied"}}
     }
   ]
 }
