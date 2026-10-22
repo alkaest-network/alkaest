@@ -17,7 +17,7 @@ The requirements:
 
 1. **A local AI administers the project.** It works out what the project needs, for example a visual identity, and how much each thing costs. It ranks needs by importance and, when money is available, funds the most important ones.
 2. **Anyone can open a paid task, like a Bisq offer.** The task creator chooses the **currency and payment method**.
-3. **Proof of work is judged by a randomly drawn mediator.** For code, the proof of work is the pull request. Payment is released only after that third party approves.
+3. **Proof of work is judged by a randomly drawn mediator.** For code, the proof of work is the patch on the canonical Radicle repository (ADR-0010). Payment is released only after that third party approves.
 4. **Fees.** The mediator earns a fee, and a small share goes to Alkaest's maintenance.
 5. **Income.** It comes from donations and from network activity, all in crypto. Bisq is used when someone wants fiat.
 
@@ -178,7 +178,7 @@ The policy is a signed object in the `alkaest-network` space. The agent reads it
 * **Rubber-stamping mediators** who approve without reading are deterred by comprehension checks, reasoned verdicts and appeals that forfeit bonds (§2.1). None of these is a proof, which is why appeals exist.
 * **Randomness bias.** The seed uses a future Bitcoin block hash. A miner could bias the draw only by throwing away valid blocks, which costs far more than a typical task. For very large tasks, the seed can combine several blocks.
 * **Untrusted deliverables.** Code from tasks runs only in isolated CI or throwaway VMs, never on the machine that holds the agent's or the reserve's keys.
-* **Least privilege for the agent.** GitHub tokens are limited to issues and comments, with no merge rights. The network reaches only GitHub and its own Bitcoin and Lightning nodes. Every action is a signed event or a public comment.
+* **Least privilege for the agent.** Forge credentials are limited to issues and comments, with no merge rights: its Radicle identity is never a repository delegate, and any GitHub-mirror token is read and comment only. The network reaches only the project's forges and its own Bitcoin and Lightning nodes. Every action is a signed event or a public comment.
 * **Bootstrapping the mediator pool.** A small initial pool is a trust assumption, not proof of decentralization. Publish its membership, conflicts, decision history, limits, and appeal path; keep consequential decisions supervised until independent participation and RFC gates justify expansion.
 
 ---

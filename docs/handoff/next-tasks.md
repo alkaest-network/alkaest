@@ -7,6 +7,7 @@ This list is ordered by dependency. Do not start token issuance, reputation-weig
 - [x] Publish the root contribution guide, Code of Conduct, security policy, issue forms, and pull request template on the public default branch (done in PRs #5 and #6).
 - [ ] Enable GitHub private vulnerability reporting or provide a verified private security contact; confirm the Code of Conduct reporting channel works.
 - [ ] Resolve licensing for the public `alkaest-ai` repository and any companion repository without a license file. The node, app, Brain, and chatbot repositories are private and open to contributors only by maintainer invitation. The Flutter app currently depends on the node repository's private `alkaest-core` package.
+- [ ] Move to Radicle (ADR-0010): create the canonical repository with `rad init`, choose the delegates, set up the project seed node as a Tor onion service ([operations guide](../operations/radicle-seed-node.md)), set up the GitHub mirror push, and publish the RID, Node ID and onion address in README, CONTRIBUTING and the contributor page.
 - [ ] Review and open the [draft contributor starter issues](contributor-starter-issues.md) now that the contribution guide is public; assign a maintainer to triage issues and review pull requests.
 
 ## Immediate priority — Define Brain-led task selection and treasury policy

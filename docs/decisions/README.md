@@ -13,7 +13,7 @@ ADRs record the current Alkaest product and architecture decisions. Status is au
 | [0007](ADR-0007-autonomous-treasury-and-bitcoin-audit.md) | Policy-bounded autonomous treasury and Bitcoin audit | Accepted direction | RFC-0014 and RFC-0008 remain Draft; no mainnet authority |
 | [0008](ADR-0008-token-design-before-issuance.md) | Design token before considering issuance | Accepted direction | Purpose, rights, supply, chain, legal status, and launch remain open |
 | [0009](ADR-0009-resource-aware-capacity-and-deployment.md) | Resource-aware node capacity and deployment | Proposed | Proposes deferring Kubernetes until measured multi-host operations justify it; protocol resource profiles and benchmarks remain open |
-| [0010](ADR-0010-decentralized-source-and-site-hosting.md) | Decentralized source and site hosting | Proposed | Radicle or NIP-34 as canonical forge, seed/pin operators, and migration timing remain open |
+| [0010](ADR-0010-decentralized-source-and-site-hosting.md) | Decentralized source and site hosting | Accepted | Radicle is canonical (patches and paid work), GitHub a mirror, project seed as a Tor onion service; delegates, extra seeds, Radicle-to-Alkaest identity mapping and IPFS pinning remain open |
 
 ## Decision dependencies
 

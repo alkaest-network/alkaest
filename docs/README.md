@@ -46,7 +46,7 @@ Missing RFC numbers are intentional gaps, not specifications. Do not create numb
 
 - [Decision index](decisions/README.md) — status and open boundary of ADR-0001 through ADR-0010.
 - [ADR-0009 — Resource-Aware Node Capacity and Deployment](decisions/ADR-0009-resource-aware-capacity-and-deployment.md) — Proposed; no Kubernetes dependency in the protocol or MVP
-- [ADR-0010 — Decentralized Source and Site Hosting](decisions/ADR-0010-decentralized-source-and-site-hosting.md) — Proposed; GitHub as mirror, decentralized forge and IPFS site as targets
+- [ADR-0010 — Decentralized Source and Site Hosting](decisions/ADR-0010-decentralized-source-and-site-hosting.md) — Accepted; Radicle is the canonical forge for code, patches and paid work, GitHub a mirror; [seed node over Tor](operations/radicle-seed-node.md)
 
 ## Overview and handoff
 
