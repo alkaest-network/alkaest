@@ -50,7 +50,7 @@ The module stays generic. It is not specific to WhatsApp, Google Calendar or bar
 
 **Why the agenda is the object, not the appointment.** RFC-0005 resolves conflicts per object: competing events for the same version slot get a deterministic winner. If each appointment were its own object, two nodes could book the same professional at the same time in two different objects, and nothing would detect it.
 
-Putting every booking for one professional and month into one `schedule` object makes overlapping bookings compete for the same version slot. Exactly one wins on every node, and the other is `conflicting` (§7).
+Putting every booking for one professional and month into one `schedule` object makes overlapping bookings compete for the same version slot. Every node then sees the same conflict, and staff resolve it with a signed event (§7).
 
 Monthly partitioning keeps each object's log small enough to replay on a phone.
 
@@ -160,7 +160,8 @@ The owner creates next month's schedule before it is needed. A node SHOULD creat
   "blockEnd": "2026-10-19T17:40:00Z",
   "bookedAt": "2026-10-18T21:15:00Z",
   "canceledBy": null,
-  "noticeMin": null
+  "noticeMin": null,
+  "outcomeAt": null
 }
 ```
 
@@ -168,7 +169,8 @@ The fields mean:
 * **appointment id:** the `evt_` id of the `appointment.booked` event that created the entry. It is content-derived and unique.
 * **`start` and `end`:** when the customer is served.
 * **`blockStart` and `blockEnd`:** what the booking occupies, including buffers.
-* **Precision:** all four are RFC 3339 UTC instants, precise to the minute.
+* **Precision:** all four are RFC 3339 UTC instants, precise to the minute, written `YYYY-MM-DDTHH:MM:00Z`.
+* **`outcomeAt`:** the signed `createdAt` of the `appointment.completed` or `appointment.no_show` event; the rating window (§6.3 rule 7) counts from it.
 
 The booking node computes these values from the catalog. The module checks only the invariants in §6.3. The catalog lives in another object, and a module sees only its own object's state (RFC-0005 §10).
 
@@ -186,6 +188,14 @@ All of these are state events on the professional's `schedule` object.
 | `appointment.canceled` | `{appointmentId, by: "customer" \| "provider"}` | Staff, or the appointment's customer identity (`by` must be `customer`) |
 | `appointment.completed` | `{appointmentId}` | Staff |
 | `appointment.no_show` | `{appointmentId}` | Staff |
+
+Conflict resolution is a resolution event (RFC-0005 §6.3, §9.6):
+
+| Event | `data` and fields | Who may perform it |
+|---|---|---|
+| `schedule.conflict_resolved` | `resolves`: every competing event id; `data`: `{selectedEventId}`, one of them | Staff or the owner |
+
+Its effect is the selected event's own transition, with that event's id and author, so a booking selected this way keeps its appointment id and customer.
 
 Notes on `services_added` and `canceled`:
 * **Added services keep the start time.** `appointment.services_added` replaces `services` with the full new list and extends `end` and `blockEnd`.
@@ -228,15 +238,20 @@ Times are compared as instants. Local-day and weekday checks convert with the sc
 
 # 7. Concurrency: Booking Without Double-Booking
 
-Every booking for one professional and month extends the same `schedule` head (RFC-0005 §6.2).
+Every booking for one professional and month extends the same `schedule` head (RFC-0005 §6.2). Two events sealed on the same head target the same version slot, whether or not their times overlap.
 
-* **Two bookings for overlapping times at the same head:** both target the same version slot. The winner is deterministic (RFC-0005 §9.5) and the loser is `conflicting`. No node will ever show both bookings.
-* **Two bookings for different times at the same head:** they also compete, because they target the same slot. The losing node **rebases**: it reads the new head, checks again that the slot is free, and seals a new event with the new `prevEventId` and `targetVersion`. If the slot is still free, the rebased booking applies.
-* **Rebasing is automatic.** The Local API (RFC-0009) rebases automatically for commands it authors. Embedded clients rebase before telling the customer anything.
+RFC-0005 forbids choosing the winner by event id, and this module does not choose it by `createdAt` either: the author signs that timestamp, so a client could backdate a booking to take a slot. Instead, the provider decides, with a signed event:
+
+1. **Competing bookings freeze the slot.** Every node marks them `conflicting` and keeps the schedule at their common ancestor.
+2. **Staff sign the resolution.** The provider's node signs `schedule.conflict_resolved` as staff, usually the agent identity. It names every competitor and selects the request that reached it first. Arrival order is the provider's node policy: clients cannot forge it, and the signed resolution records the choice, so it can be audited. Any staff member or the owner may resolve, and a later node that sees the same competitors adopts the signed resolution.
+3. **The other requests rebase.** For each competitor that was not selected, the authoring node reads the new head, checks again that the block is free, and seals a new event with the new `prevEventId` and `targetVersion`.
+   * **Different times:** the rebased booking applies. The customer is not told anything.
+   * **Overlapping times:** the rebased booking is rejected (§6.3 rule 3). The client then tells the customer that the slot was just taken and offers other times.
+4. **Automatic for clients.** The Local API (RFC-0009) resolves conflicts it can see and rebases the commands it authors without human input. Embedded clients rebase before telling the customer anything.
 
 A client confirms a booking to a customer only after its event is `applied`. Alkaest Chatbot's "Agendado ✅" message is sent after that point.
 
-Bookings are human-scale, at most a few events per professional per minute, so serializing them through one object costs nothing noticeable.
+In the normal deployment, the provider's always-on node writes every booking it receives through its Local API, so these writes are already serialized and conflicts arise only between nodes (for example an app writing directly, or a second provider node). Bookings are human-scale, at most a few events per professional per minute, so serializing them through one object costs nothing noticeable.
 
 ---
 
@@ -296,6 +311,7 @@ No-shows are recorded only by staff, never inferred.
 * **Agent identity.** The agent identity books on behalf of customers, so a compromised agent key can create or cancel bookings. Owners SHOULD give the agent its own key and remove it from `staff` to revoke it.
 * **Validation.** Customers booking with their own identity are checked like any actor (§6.3). A node never trusts client-side availability checks.
 * **Rejected bookings.** Booking events that are rejected or conflicting stay in the log as evidence. They do not block the slot.
+* **Resolver choice.** Staff decide which competing booking continues. A dishonest provider could favour one customer; the signed resolution makes that choice visible and attributable. Timestamps chosen by clients never decide it.
 
 ---
 
