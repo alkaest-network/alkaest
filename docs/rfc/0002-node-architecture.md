@@ -218,6 +218,12 @@ This baseline is implemented for the Phase 1 simulation. It defines replication 
 4. **Admission.** Every fetched envelope goes through full envelope and payload validation (RFC-0004 §11) before it is stored. An envelope that fails validation, was not requested, or belongs to a different Space MUST be rejected. Nothing a peer says changes state except valid envelopes.
 5. **Convergence.** Projections are rebuilt from the stored envelopes (RFC-0005 §11), so nodes holding the same envelope set for a Space produce byte-identical Space state, whatever order the envelopes arrived in and whichever peer delivered them.
 6. **Duplicates and replays** are idempotent: an envelope already stored changes nothing.
+7. **libp2p binding (Phase 1, Draft).** The reference node carries this baseline over libp2p:
+   - Transport: TCP or QUIC, with Noise and Yamux.
+   - Request-response protocol `/alkaest/sync/0.1.0`, JSON: `inventory {spaceId}` and `fetch {spaceId, envelopeIds}`. A node answers only for Spaces it replicates.
+   - Announcements: one gossipsub topic per Space, `alkaest/space/<spaceId>/0.1`, signed with strict validation, carrying only the ids of newly stored envelopes. Receivers fetch them through the request-response protocol, so an announcement is never evidence.
+   - Fallback: a periodic pull from connected peers.
+   - Network key: separate from every protocol identity; it names the node on the network and carries no protocol authority.
 
 Open for the next drafts:
 - serving a private Space only to its members;
