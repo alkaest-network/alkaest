@@ -44,8 +44,9 @@ Missing RFC numbers are intentional gaps, not specifications. Do not create numb
 
 ## Architecture decisions
 
-- [Decision index](decisions/README.md) — status and open boundary of ADR-0001 through ADR-0009.
+- [Decision index](decisions/README.md) — status and open boundary of ADR-0001 through ADR-0010.
 - [ADR-0009 — Resource-Aware Node Capacity and Deployment](decisions/ADR-0009-resource-aware-capacity-and-deployment.md) — Proposed; no Kubernetes dependency in the protocol or MVP
+- [ADR-0010 — Decentralized Source and Site Hosting](decisions/ADR-0010-decentralized-source-and-site-hosting.md) — Proposed; GitHub as mirror, decentralized forge and IPFS site as targets
 
 ## Overview and handoff
 
@@ -67,7 +68,7 @@ Missing RFC numbers are intentional gaps, not specifications. Do not create numb
 
 ## Contributor onboarding and project origin
 
-- [Contributor page](../contribute.html)
+- [Contributor page](https://alkaest-network.org/contribute/) — source in [`site/contribute/`](../site/contribute/index.html)
 - [Contribution guide](../CONTRIBUTING.md)
 - [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [Security policy](../SECURITY.md)

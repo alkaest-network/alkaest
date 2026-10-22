@@ -2,7 +2,7 @@
 
 Alkaest is an early-stage, protocol-first project exploring how people can coordinate work through local nodes, cryptographic identities, verifiable evidence, and portable reputation. We welcome careful contributions that make the protocol clearer, safer, and more useful.
 
-**Start here:** [Contributor page](contribute.html) · [Project overview](README.md) · [Roadmap](docs/overview/roadmap.md)
+**Start here:** [Contributor page](https://alkaest-network.org/contribute/) · [Project overview](README.md) · [Roadmap](docs/overview/roadmap.md)
 
 Browse [open issues](https://github.com/alkaest-network/alkaest/issues) or [open a new issue](https://github.com/alkaest-network/alkaest/issues/new/choose) in the public protocol repository.
 
