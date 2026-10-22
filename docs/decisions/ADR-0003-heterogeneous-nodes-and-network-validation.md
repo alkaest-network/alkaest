@@ -73,7 +73,7 @@ The first implementation still builds the **Standard** profile on a desktop (ADR
 ### 5. Reference technology (proposed)
 
 * Node core in **Rust**: runs on phones (via UniFFI), ARM boards and servers with one codebase and a small footprint.
-* **libp2p**: QUIC and TCP transports, Kademlia DHT for discovery, gossipsub for propagation, AutoNAT, hole punching and circuit relay v2 for nodes behind NAT. An optional Tor transport, as in Bisq.
+* **libp2p**: QUIC and TCP transports, Kademlia DHT for discovery, gossipsub for propagation, AutoNAT, hole punching and circuit relay v2 for nodes behind NAT. An optional Tor transport, as in Bisq. Adopted in the reference node for Phase 1: TCP/QUIC, Noise, Yamux, a request-response sync protocol and gossipsub announcements (RFC-0002 §6.6.1); discovery, NAT traversal and relays are not implemented yet.
 * Storage: SQLite for light and standard nodes, an embedded key-value store (RocksDB) for service nodes.
 * Integrations such as Alkaest Chatbot stay outside the node and talk to its local API (RFC-0002 §5.2).
 
