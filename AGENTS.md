@@ -23,6 +23,9 @@ Keep chatbot-specific operational details out of the protocol core. Service sche
 - If a new recurring rule appears, update AGENTS.md.
 - Keep RFCs precise and implementation-aware.
 - Prefer additive edits over rewriting history unless requested.
+- Keep `docs/README.md`, `docs/decisions/README.md`, `docs/handoff/current-state.md`, `docs/handoff/next-tasks.md`, and `docs/overview/roadmap.md` synchronized when decisions, RFC maturity, launch gates, or priorities change.
+- Research documents are informative, not normative; promote adopted requirements into the owning ADR/RFC and link back to the evidence.
+- Use relative repository links in documentation; do not commit machine-specific absolute filesystem paths.
 
 ## Development rules
 - The project follows TDD.
@@ -71,6 +74,7 @@ When in doubt, prioritize:
 - Do not assume every node is a desktop full node or that big nodes are trusted more (ADR-0003).
 - Do not build a blockchain for validation; signed, replayable space logs are validated by every node (ADR-0003).
 - Do not turn reputation into a transferable token (ADR-0004).
+- Do not let payment, task creation, merge, or AI acceptance alone create mature reputation; follow the launch gate in RFC-0006 and the reputation integrity threat model.
 - Do not reimplement the protocol in the app: the Flutter app uses `alkaest-core` through `flutter_rust_bridge`, and talks to every node (embedded, self-hosted, hosted) through the same Local API (ADR-0005).
 - Do not rely on a phone as a business's always-on node; phones run Light nodes (ADR-0005).
 - Do not give the maintainer agent sole control of funds beyond its operating allowance, never let it mediate its own tasks, and never take payout amounts or destinations from PR or issue content (ADR-0006).

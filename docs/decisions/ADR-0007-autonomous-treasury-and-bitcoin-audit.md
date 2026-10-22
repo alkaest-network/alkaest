@@ -1,0 +1,38 @@
+# ADR-0007 — Autonomous Treasury and Bitcoin Audit Trail
+
+**Status:** Accepted direction; protocol details in RFC-0014
+**Date:** 2026-10-18
+**Decision Type:** Governance, Treasury and Security
+**Related:** ADR-0003, ADR-0004, ADR-0006, ADR-0008, RFC-0003, RFC-0008, RFC-0013, RFC-0014, [Long-term Continuity Requirements](../research/long-term-continuity-requirements.md)
+
+## Context
+
+Alkaest intends to fund its own development. After launch, project changes—including code, documentation, configuration, and visual identity—must be tied to explicit scope and acceptance criteria. The treasury agent should be able to identify work, publish funded tasks, inspect completion evidence, and authorize routine contributor payments without relying on a private operator's unrecorded judgment.
+
+The existing network design uses signed, replayable event logs and does not require a blockchain for ordinary protocol validation (ADR-0003). That design does not itself prevent double-spending treasury funds, prove when a payment happened, or provide a public audit trail for BTC settlement. ADR-0004 already selects Bitcoin as the first settlement layer.
+
+## Decision
+
+1. **Every post-launch project change is tracked.** Each change to an Alkaest project repository or published project artifact MUST reference a protocol `WorkItem` or an explicitly authorized maintenance decision. This includes software, tests, dependencies, configuration, documentation, and visual identity. WorkItems carry scope, acceptance criteria, budget (if paid), and evidence requirements.
+2. **The Brain selects work and bounty within a signed policy.** Using provenance-labeled metrics, operational reports, contributor feedback, complaints, and the verified treasury ledger, the Brain may rank candidate needs, decide which issue/WorkItem to open, and choose its BTC bounty within signed pricing and spending bounds. A deterministic policy/balance gate checks its proposed action before publication and funding. The Brain cannot change policy, invent or count unconfirmed funds, increase its allowance, breach the reserve floor, or alter frozen task terms. Disputed signals, uncertain pricing, and out-of-policy tasks are deferred or escalated.
+3. **Routine payment can be autonomous.** For a funded WorkItem, the agent may sign acceptance and release the escrow only when the predeclared acceptance rules pass. For software, the rules include evidence for the exact submitted commit, required independent review approvals, merge status, and required CI/security checks. For design and other non-code work, the WorkItem defines the artifact, review, and completion evidence before work begins. A provider's “approved” status alone is not enough.
+4. **The decision is a protocol event.** Every funding, policy, acceptance, rejection, and payout decision is signed and recorded with the applicable policy version, evidence references or digests, agent identity, and settlement reference. Disputed or exceptional cases go to an independent mediator under RFC-0013. The agent cannot mediate a task it created or fund itself.
+5. **Bitcoin is the public treasury and settlement audit layer.** Donations and payouts use Bitcoin settlement mechanisms specified by RFC-0008. Periodic commitments to the signed treasury/workflow log are anchored to Bitcoin. On-chain records contain settlement transactions and compact commitments only; source code, issue/PR content, personal data, and full workflow payloads remain off-chain. Nodes continue to validate protocol events from signatures and deterministic rules, not by replaying the Bitcoin chain as global protocol state.
+6. **Funds remain bounded and traceable.** The reserve stays under the multisignature controls in ADR-0006. The agent's operating allowance is capped and visible; task funds are escrowed before work starts. Every allocation and payment is reconcilable from the protocol log and Bitcoin transaction references.
+7. **Deployment is gated.** No real-money treasury operation is enabled until RFC-0003, RFC-0008, RFC-0013, and RFC-0014 are specified and accepted; the full workflow passes adversarial `regtest` and independent multi-node verification; policy, key separation, emergency pause, and recovery drills pass independent review; and legal/accounting review is complete. Until then, the agent can plan and create simulated tasks only.
+8. **Validate adversarial inputs before economic state changes.** Signed peer, adapter, contributor, and AI messages remain untrusted input. Monetary/state transitions must validate ranges, units, authority, cross-field invariants, and actual settlement transactions before atomic state mutation. A signature alone is not semantic validation. RFC-0014 defines the gates, with the [Bisq May 2026 incident review](../research/bisq-may-2026-incident-and-alkaest-mitigations.md) as a concrete threat case.
+9. **Contain failures without granting unilateral control.** A signed pause proposal and separate role-specific guardian approvals may stop new allocations and routine payout authorizations while a critical incident is investigated. It cannot let one agent seize funds, erase history, or cancel already-valid refunds; it expires under a deterministic policy rule. The Draft process is specified in [RFC-0014 §10.1](../rfc/0014-treasury-agent-and-release-authorization.md#101-emergency-pause-and-recovery-authority).
+10. **Continuity cannot depend on the founder.** Before real-money authority, the system must specify and drill key rotation/recovery, release authority succession, bounded emergency pauses, and safe exit/fork behavior. Recovery cannot rewrite valid history, redirect funds without the governing spending authority, or let a recovery quorum expand its own powers. If no valid quorum is available, preserve the last valid policy and suspend only the actions whose authority cannot be established.
+
+## Consequences
+
+- Alkaest's own post-launch development becomes a live example of the protocol's funded-work lifecycle.
+- Contributors can inspect why a task was funded, what was accepted, and which transaction paid it.
+- Bitcoin provides scarce, independently verifiable settlement and timestamping without introducing an Alkaest token or a custom chain.
+- A GitHub merge, CI result, model output, or blockchain transaction is evidence for a decision; none alone proves that a contribution meets its intended quality.
+- The Brain's task prioritization can adapt to network needs without per-task human approval inside its configured envelope; transparent policy, evidence provenance, deterministic BTC accounting, and challenge paths bound its discretion.
+- The treasury agent is a policy-bound protocol actor, not a trusted root. Its model and output cannot be independently reproduced in every case, so its authority, rules, evidence, and signed decisions must be auditable and its spend bounded.
+- The implementation is not launch-ready: RFC-0014 must define event schemas, policy evaluation, provider evidence, key separation, and recovery before real funds are enabled.
+- Security tests must exercise malicious but correctly signed messages, invalid monetary bounds, inconsistent settlement outputs, and no-partial-mutation behavior before any real treasury operation.
+- The century-scale reference in the continuity research is a stress-test horizon, not an adoption forecast or a commitment to operate for a fixed term. A safe shutdown or independent fork is an acceptable continuity outcome.
+- Guardian thresholds, key-holder diversity, pause duration, release succession, and artifact redundancy remain unresolved parameters. They must be selected and reviewed before the supervised real-money phase.

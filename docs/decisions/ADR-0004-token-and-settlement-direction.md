@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-10-18
 **Decision Type:** Economic and Protocol Direction
-**Related:** ADR-0003, roadmap RFC-0008 (escrow, bonds and settlement)
+**Related:** ADR-0003, ADR-0007, RFC-0008 (escrow, bonds and settlement), RFC-0014 (treasury agent)
 
 ---
 
@@ -34,10 +34,11 @@ Alkaest has three distinct things that are easy to conflate:
 ## Recommendation
 
 1. **Reputation is never a token.** It is derived from signed evidence (ADR-0003) and cannot be transferred, bought or staked away.
-2. **No token until there is real usage.** Phases 0 to 3 of the rollout plan run without one.
-3. **When value moves, settle on Bitcoin first (option B).** It matches the Bisq model the network wants to follow, avoids launching an asset, and keeps escrow peer-to-peer. Stablecoin rails on Bitcoin (Liquid, Taproot Assets) can be evaluated for price-stable service payments.
-4. **If incentives or governance need an asset, evaluate option C**, after legal advice. Avoid D and E.
-5. **Prototype locally with no real money**: Bitcoin `regtest` plus a local Lightning network (for example Polar) and simulated escrow between local nodes. This is the "first running locally" step; the global testnet then uses Bitcoin `signet`.
+   Reputation must also resist self-dealing and collusion before it affects authority, funding, or governance; RFC-0006 is a launch gate (see `docs/research/reputation-integrity-threat-model.md`).
+2. **Design before launch; issue only after gated approval.** Token purposes and architecture are researched before implementation hardens assumptions (ADR-0008), while rollout phases 0 to 3 still run without an issued asset.
+3. **When value moves, settle on Bitcoin first (option B).** It matches the Bisq model the network wants to follow, avoids launching an asset, and keeps escrow peer-to-peer. Under ADR-0007, Bitcoin is also the required external audit layer for Alkaest treasury deposits, escrow settlements, payouts, and periodic treasury-log commitments after real treasury operation is enabled. Stablecoin rails on Bitcoin (Liquid, Taproot Assets) can be evaluated for price-stable service payments.
+4. **Evaluate a governance/incentive asset under ADR-0008**, after multi-project simulations, security analysis, and legal advice. No chain or token mechanics are selected by this ADR. Avoid E; compare existing layers before choosing any asset representation.
+5. **Prototype locally with no real money**: the first settlement conformance target is on-chain Bitcoin escrow in `regtest`, using simulated tasks between local nodes. Lightning is deferred until a separate RFC specifies its hold-invoice, timeout, claims, refunds, and liquidity semantics. The global testnet follows only after the applicable RFCs are accepted and reviewed.
 
 ---
 
@@ -54,10 +55,13 @@ Obtain qualified, jurisdiction-specific legal advice before enabling real-money 
 
 ## Decision
 
-Accepted on 2026-10-18: **no token now (option A); when payments arrive, settle on Bitcoin (option B).**
+Accepted on 2026-10-18: **do not issue a token now; when payments arrive, settle on Bitcoin (option B), while designing the future token architecture under ADR-0008.**
 
 * Reputation is never a token.
-* No asset is issued during rollout phases 0 to 3.
-* Payment and escrow prototypes run only on Bitcoin `regtest` with a local Lightning network, then `signet` on the global testnet.
-* A Bitcoin-native governance or incentive asset (option C) may be reconsidered later, only after legal advice and a new ADR.
-* RFC-0008 (escrow, bonds and settlement) is written against this decision.
+* Reputation cannot grant consequential authority until RFC-0006 resolves the self-dealing/Sybil threat model and appeal process.
+* The intended initial payment asset for paid contributor WorkItems is BTC through Alkaest's funded-work and settlement flow. Contributors may independently use Bisq to seek a peer-to-peer BTC-to-fiat trade; Bisq is optional and conversion is outside Alkaest. RFC-0008 must still select and specify the actual Bitcoin settlement rail, fee handling, quote denomination, escrow, and refund behavior. No availability, liquidity, rate, or instant fiat conversion is promised. See [Bitcoin payouts and optional Bisq conversion](../research/bitcoin-payouts-and-bisq-conversion.md).
+* No asset is issued during rollout phases 0 to 3; token design and valueless simulations may proceed under ADR-0008.
+* Payment, escrow, treasury, and audit-anchor prototypes begin with on-chain BTC on `regtest`; Lightning is deferred to a separate specification. `signet` experiments require the relevant RFCs and security review. Real treasury operation is gated by ADR-0007, RFC-0003, RFC-0008, RFC-0013, and RFC-0014.
+* No custom Alkaest chain is planned. Bitcoin anchors treasury settlement and audit commitments; Alkaest nodes validate signed protocol event logs independently under ADR-0003.
+* The governance/incentive asset remains unresolved; ADR-0008 requires research, simulations, legal review, and a separate launch decision before issuance.
+* RFC-0008 (escrow, bonds and settlement) must be written against this decision before real-money settlement.

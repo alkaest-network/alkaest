@@ -3,6 +3,11 @@
 **Status:** Accepted
 **Date:** 2026-03-16
 **Decision Type:** Product and Architecture
+**Amended by:** [ADR-0003](ADR-0003-heterogeneous-nodes-and-network-validation.md), [ADR-0005](ADR-0005-cross-platform-app-and-deployment-modes.md)
+
+## Current interpretation
+
+Desktop-first describes the first implementation target, not the only supported node type. ADR-0003 supersedes this ADR's original full-node-only assumption: the first implementation is a local Standard node, while the protocol architecture supports Light, Standard, and Service profiles from the start. The historical context and rationale below explain the original decision.
 
 ---
 

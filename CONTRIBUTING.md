@@ -2,13 +2,13 @@
 
 Alkaest is an early-stage, protocol-first project exploring how people can coordinate work through local nodes, cryptographic identities, verifiable evidence, and portable reputation. We welcome careful contributions that make the protocol clearer, safer, and more useful.
 
-**Start here:** [Project overview](README.md) · [Roadmap](docs/overview/roadmap.md) · [Contribution guide](CONTRIBUTING.md)
+**Start here:** [Contributor page](contribute.html) · [Project overview](README.md) · [Roadmap](docs/overview/roadmap.md)
 
 Browse [open issues](https://github.com/alkaest-network/alkaest/issues) or [open a new issue](https://github.com/alkaest-network/alkaest/issues/new/choose) in the public protocol repository.
 
 ## Choose a repository
 
-This repository is the public home for protocol specifications, decisions, research, and planning. It does not contain the Rust node, Flutter app, Brain, agent toolkit, or chatbot implementation.
+This repository is the public home for protocol specifications, decisions, research, and planning. The Rust node, Flutter app, Brain, agent toolkit, and chatbot implementation live in separate repositories listed below; the node, app, Brain, and chatbot repositories are private, so implementation contributions there require an invitation from a maintainer.
 
 | Area | Repository | Contribution notes |
 |---|---|---|

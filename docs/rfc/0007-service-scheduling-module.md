@@ -4,7 +4,7 @@
 **Author:** modern_alchemist
 **Date:** 2026
 **Category:** Module Specification
-**Related:** RFC-0001, RFC-0004, RFC-0005 §10, RFC-0006 (reputation), RFC-0009, ADR-0002, ADR-0005, `docs/overview/chatbot-to-network-strategy.md`
+**Related:** RFC-0001, RFC-0004, RFC-0005 §10, RFC-0006 (reputation; planned, not yet written), RFC-0009, ADR-0002, ADR-0005, `docs/overview/chatbot-to-network-strategy.md`
 
 Note on numbering: this number was reserved for "Validation and Dispute Resolution" in the roadmap. That RFC is now RFC-0013.
 
@@ -32,7 +32,7 @@ The module stays generic. It is not specific to WhatsApp, Google Calendar or bar
 
 * Reputation formulas (RFC-0006). This RFC only defines which facts reputation may consume (§10).
 * Payments, deposits and no-show fees (RFC-0008).
-* Fine-grained roles (RFC-0011). Until then, a schedule carries an explicit staff list (§5.2).
+* Fine-grained roles (RFC-0011, planned, not yet written). Until then, a schedule carries an explicit staff list (§5.2).
 * Shared resources (rooms, chairs, equipment) and appointments with several professionals (§12).
 
 ---
@@ -196,7 +196,11 @@ Rating is an evidence event (RFC-0005 §6.3):
 
 | Event | `data` | Who may perform it |
 |---|---|---|
-| `appointment.rated` | `{appointmentId, stars}` (`stars` from 1 to 5) | The appointment's customer, or staff relaying the customer's answer on a channel |
+| `appointment.rated` | `{appointmentId, stars, source, consentRecorded}` (`stars` from 1 to 5; `source` is `identity_signed` or `channel_relayed`; `consentRecorded` is `true`) | The appointment's customer, or staff relaying the customer's answer on a channel |
+
+An `appointment.rated` event is feedback, not proof that the appointment was completed or that the provider performed useful work. For `identity_signed`, the event author MUST be the customer's Alkaest identity. For `channel_relayed`, the event author is the staff/integration identity; it MUST be labeled as relayed feedback and MUST NOT be presented as a cryptographically signed customer statement. The boolean `consentRecorded` is the relaying staff/integration's signed attestation that the customer opted in; it does not independently prove what was shown in the channel or who controlled the channel account. Direct customer-signed feedback may be represented only when the customer acts through an Alkaest identity.
+
+Feedback requests MUST be optional and sent only after the appointment outcome. The customer must receive a clear explanation of what will be recorded and how it may be used; silence or refusal creates no rating and MUST NOT affect service access. Free-text comments are not part of this RFC's portable evidence schema. They MUST remain in the provider's private product records unless a later specification defines minimization, consent, retention, and selective disclosure. Raw comments MUST NOT be replicated to the wider network or used directly as reputation evidence.
 
 ## 6.3 Legality rules
 
@@ -273,10 +277,13 @@ Migration happens in two steps:
 
 # 10. Reputation Evidence Boundaries
 
-RFC-0006 may consume only these facts from this module:
+This module defines candidate source events only; it does not create a public rating score or authorize reputation use. RFC-0006 may consume only these facts after its integrity, privacy, and launch gates are met:
 
-* **Provider reputation:** `appointment.rated` on `completed` appointments, aggregated per professional and per provider.
-* **Customer reliability:** `completed`, `no_show`, and `canceled` with `by` and `noticeMin`, per customer reference.
+* **Service outcome evidence:** `appointment.completed` is a provider-authored assertion that the provider recorded completion; it is not independent proof of quality or customer satisfaction.
+* **Customer feedback evidence:** `appointment.rated` on `completed` appointments, with consent, source provenance, conflict, and manipulation checks defined by RFC-0006. A relayed channel response has weaker provenance than a customer-signed event and must remain distinguishable.
+* **Customer evidence:** `completed`, `no_show`, and `canceled` with `by` and `noticeMin`, per customer reference; it remains local to the provider's space unless a later rule and consent allow otherwise.
+
+Ratings, provider payment status, provider-recorded completion, task completion, or a single appointment event MUST NOT independently grant mature reputation, improve consequential ranking, or affect funding/authority. A self-reported rating is an input claim, not verified merit.
 
 Customer reliability stays inside the provider's space until the open legal question in NETWORK_READINESS.md (cross-establishment sharing under LGPD) is resolved.
 
@@ -297,5 +304,5 @@ No-shows are recorded only by staff, never inferred.
 * Shared resources and multi-professional appointments: a `resource` schedule, plus an atomic booking across two objects.
 * Recurring appointments.
 * Deposits and no-show fees (RFC-0008).
-* Replacing `staff` lists with RFC-0011 capabilities.
+* Replacing `staff` lists with RFC-0011 capabilities (RFC-0011 is planned, not yet written).
 * Allowing a single appointment that crosses local midnight (night shifts).

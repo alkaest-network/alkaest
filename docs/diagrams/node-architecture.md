@@ -5,7 +5,7 @@ flowchart TD
     UI["Developer UI / Automation"] --> API["API Server"]
     GH["GitHub Integration"] --> ADAPTER["Integration Adapters"]
 
-    subgraph NODE["Local Alkaest Node (MVP Full Node)"]
+    subgraph NODE["Local Standard Node (first implementation target)"]
         API --> CMD["Command Handler"]
         ADAPTER --> CMD
         CMD --> ID["Identity Engine"]
@@ -23,6 +23,5 @@ flowchart TD
 
 ## Notes
 
-- The MVP assumes a local full node per developer.
+- This diagram shows the first implementation path. The architecture supports Light, Standard, and Service profiles; see [RFC-0002](../rfc/0002-node-architecture.md) §16 and [ADR-0003](../decisions/ADR-0003-heterogeneous-nodes-and-network-validation.md).
 - GitHub is an integration input, not protocol authority.
-- Light-client behavior is intentionally out of scope for this diagram.
