@@ -13,6 +13,7 @@ ADRs record the current Alkaest product and architecture decisions. Status is au
 | [0007](ADR-0007-autonomous-treasury-and-bitcoin-audit.md) | Policy-bounded autonomous treasury and Bitcoin audit | Accepted direction | RFC-0014 and RFC-0008 remain Draft; no mainnet authority |
 | [0008](ADR-0008-token-design-before-issuance.md) | Design token before considering issuance | Accepted direction | Purpose, rights, supply, chain, legal status, and launch remain open |
 | [0009](ADR-0009-resource-aware-capacity-and-deployment.md) | Resource-aware node capacity and deployment | Proposed | Proposes deferring Kubernetes until measured multi-host operations justify it; protocol resource profiles and benchmarks remain open |
+| [0010](ADR-0010-decentralized-source-and-site-hosting.md) | Decentralized source and site hosting | Proposed | Radicle or NIP-34 as canonical forge, seed/pin operators, and migration timing remain open |
 
 ## Decision dependencies
 
@@ -24,6 +25,7 @@ ADR-0006 ──> RFC-0013 (validation/disputes) ──> RFC-0003/RFC-0014
 ADR-0007 ──> RFC-0008 + RFC-0014
 ADR-0008 ──> future token RFC (not yet numbered)
 ADR-0003 ──> ADR-0009 ──> RFC-0002 resource/capability follow-up
+ADR-0006 ──> ADR-0010 (maintainer agent may operate a seed node)
 Reputation integrity research ──> RFC-0006 (not written; production gate)
 Bisq incident research ──> RFC-0004/0005 security review + RFC-0008/0014 launch gates
 ```
