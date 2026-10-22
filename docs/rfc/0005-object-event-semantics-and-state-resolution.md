@@ -183,7 +183,7 @@ These advance object state and normally increment the object version.
 
 Examples:
 
-* `work_item.assigned`
+* `work_item.assignment_accepted`
 * `work_item.accepted`
 * `work_item.closed`
 
@@ -340,7 +340,7 @@ An authoritative resolution MUST be a schema-defined state-changing event that i
 
 For the MVP, parties SHOULD first have the option to resolve a non-financial conflict by mutual agreement. An optional mediator may facilitate that agreement but has no authority to change protocol state; the outcome takes effect only through the required party-signed events.
 
-If agreement is unavailable, the proposed baseline is a Space-scoped panel of three distinct, pre-authorized resolver identities, with approval by at least two eligible panel members for one exact resolution digest. The roster and threshold MUST be fixed by a versioned Space policy before the conflict is known. A resolver with a declared or policy-visible conflict MUST abstain; if fewer than two eligible members remain, the conflict stays unresolved until an authorized roster update or other policy-defined recovery. Neither the affected parties nor a conflicted resolver may appoint a replacement for that case.
+If agreement is unavailable, the proposed baseline is a Space-scoped panel of three distinct, pre-authorized resolver identities, with approval by at least two eligible panel members for one exact resolution digest. The roster and threshold MUST be fixed by a versioned Space policy before the conflict is known. RFC-0003 §14 defines the versioned Space policy object; its schema v1 does not yet include a resolver roster, so no resolver panel exists until a later schema version adds one. A resolver with a declared or policy-visible conflict MUST abstain; if fewer than two eligible members remain, the conflict stays unresolved until an authorized roster update or other policy-defined recovery. Neither the affected parties nor a conflicted resolver may appoint a replacement for that case.
 
 A resolution MUST name the object, common ancestor, all competing branch roots known to the resolver panel at decision time, selected branch or module-valid cancellation outcome, evidence references, policy/roster version, and appeal route. It MUST NOT rewrite prior events, change unrelated objects, or authorize moderation sanctions, reputation penalties, escrow release/refund, or treasury spending. Mediation, branch resolution, moderation, and financial settlement remain separate authorities; payment cases follow RFC-0013 and RFC-0008.
 
@@ -449,17 +449,17 @@ They are usually immutable once created, though they may target mutable objects 
 
 # 15. Example: WorkItem Assignment Conflict
 
-Two contributors race for the same funded `WorkItem`.
+Two assignment authorities propose different contributors for the same claimed `WorkItem`.
 
 Events received:
 
-* `evt_a`: `work_item.assigned`, `targetVersion=2`, `prevEventId=evt_funded`
-* `evt_b`: `work_item.assigned`, `targetVersion=2`, `prevEventId=evt_funded`
+* `evt_a`: `work_item.assignment_proposed` to contributor A, `targetVersion=4`, `prevEventId=evt_claim`
+* `evt_b`: `work_item.assignment_proposed` to contributor B, `targetVersion=4`, `prevEventId=evt_claim`
 
 If both events are individually valid and no authorized resolution exists:
 
-* keep the projection at `evt_funded`
-* classify both assignment events as `conflicting`
+* keep the projection at `evt_claim`
+* classify both proposals as `conflicting`
 * keep their descendants pending
 * require a module-authorized `work_item.assignment_resolved` event naming the conflict and selected branch
 

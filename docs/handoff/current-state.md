@@ -36,7 +36,7 @@
 
 These components live outside this repository; see the [repository map](../../CONTRIBUTING.md#choose-a-repository).
 
-- `alkaest-node` (private): `main` has the Phase 0 node plus a signed Local API, device pairing, and server-sent event streaming (node PR #1 merged). It does **not** yet conform to the Draft RFC-0004/0005 vectors; conformance work is starting.
+- `alkaest-node` (private): `main` has the Phase 0 node plus a signed Local API, device pairing, and server-sent event streaming. It now passes the Draft RFC-0004/0005 vectors (RFC 8785 canonical JSON, domain-separated ids, fail-closed conflicts), implements the RFC-0003 assignment proposal/acceptance flow with `paid` reachable only through settlement, and enforces Space policy roles and the review gate of RFC-0003 §14 (node PRs #2–#5). Settlement (RFC-0008), dispute cases (RFC-0013) and resolver panels (RFC-0005 §9.7) are not implemented.
 - `alkaest-app` (private): Flutter connect mode with device pairing, exercised end to end against a real node.
 - `alkaest-brain` (private): the phase A planner.
 - `alkaest-chatbot` (private): the WhatsApp scheduling product.

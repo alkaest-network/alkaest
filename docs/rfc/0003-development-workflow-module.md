@@ -112,7 +112,7 @@ The payout recipient identity is fixed by the accepted assignment and cannot be 
 
 ## 4.8 Role separation and authority
 
-The project Space policy MUST name the authorities for WorkItem creation, funding allocation, assignment, validation, acceptance, payout authorization, settlement observation, and dispute resolution. These are separate protocol actions even when one identity is authorized for more than one action. A role or provider integration cannot acquire authority merely by operating a GitHub account, CI workflow, node profile, or AI model.
+The project Space policy MUST name the authorities for WorkItem creation, funding allocation, assignment, validation, acceptance, payout authorization, settlement observation, and dispute resolution. §14 defines the policy object, its versioning, and the roles schema v1 covers. These are separate protocol actions even when one identity is authorized for more than one action. A role or provider integration cannot acquire authority merely by operating a GitHub account, CI workflow, node profile, or AI model.
 
 | Role | May do | Must not do by virtue of this role |
 |---|---|---|
@@ -364,7 +364,7 @@ ValidationRecord
 - createdAt
 ```
 
-Each `work_item.validation_attested` event MUST cite the exact submitted revision/digest and frozen term version. `pass` is a validator result, not by itself the protocol's `accepted` state; the acceptance authority records `work_item.accepted` only after every frozen review gate passes. `request_revision` and `reject_final` map to the distinct transitions in §10. A final rejection does not itself cancel the WorkItem or determine reputation.
+Each `work_item.validation_attested` event MUST cite the exact submitted revision/digest and frozen term version. `pass` is a validator result, not by itself the protocol's `accepted` state; the acceptance authority records `work_item.accepted` only after every frozen review gate passes. `request_revision` and `reject_final` map to the distinct transitions in §10. A final rejection does not itself cancel the WorkItem or determine reputation. §14.3 defines who may attest and how attestations gate acceptance.
 
 ## 7.5 PayoutRecord
 
@@ -716,21 +716,76 @@ For the MVP, validator membership may be project-declared.
 
 ---
 
-# 14. Project Integration Configuration
+# 14. Space Policy and Project Configuration
 
-Projects using this module will likely need a project-local configuration file.
+## 14.1 Space policy object
 
-This RFC expects a future `.alkaest/project.yaml` draft to define fields such as:
+The authorities in §4.8 are named by one versioned policy object per project Space.
 
-* project identity
+Recommended object type and schema:
+
+```text
+space_policy
+alkaest.workflow.space_policy.v1
+```
+
+Policy document (the object's projected state):
+
+```text
+SpacePolicy
+- policyVersion      uint, starts at 1
+- requiredReviews    uint ≥ 1: independent passing attestations needed before acceptance
+- roles
+  - funding          [identityId]: fund, open, cancel and close WorkItems
+  - assignment       [identityId]: decline claims; propose, expire or release assignments
+  - review           [identityId]: attest, request revision, reject
+  - acceptance       [identityId]: record work_item.accepted
+  - payout           [identityId]: record work_item.payout_authorized
+```
+
+Every role MUST list at least one identity, without duplicates. Unknown fields and unknown roles MUST make the document invalid. One identity MAY hold several roles; the roles remain separate protocol actions (§4.8).
+
+Rules:
+
+1. Only the Space owner may create the policy object and author its events. A `space_policy` object owned by any other identity has no authority and MUST be ignored for role checks.
+2. `space_policy.updated` is a state event whose `data` is the complete replacement document. It is valid only when `data.policyVersion` is exactly the current version plus one. Partial updates are not defined.
+3. Every version that was ever applied remains resolvable: work frozen under an earlier version keeps its rules after later updates.
+4. If a Space contains more than one policy object owned by the Space owner, the policy is ambiguous. Nodes MUST fail closed: no WorkItem in that Space can be funded, and no role check against a policy version can succeed.
+5. A node resolves the policy object's applied versions before validating other objects in the same Space, so role checks never depend on arrival order across objects.
+
+## 14.2 Freezing the policy into a WorkItem
+
+`work_item.funded` MUST cite `data.policyVersion`, naming a version the Space has published. Funding binds that version to the WorkItem with the other frozen terms (§4.7). Every later role check for that WorkItem uses only the frozen version; a policy update never changes the authorities of funded work. If the frozen version cannot be resolved, every role check fails.
+
+The WorkItem records the funding identity. That identity, the WorkItem owner (requester) and the assignee are never independent reviewers for it.
+
+## 14.3 Review gate
+
+- `work_item.submitted` MUST name the delivered `revision`. A new submission discards attestations recorded for an earlier revision.
+- `work_item.validation_attested`, `work_item.revision_requested` and `work_item.rejected` MUST be authored by an identity holding `review` that is not the requester, the funder or the assignee, and MUST name the submitted `revision`. `validation_attested` is a state event, so the attestation count is part of the ordered history. One reviewer counts once per revision.
+- `work_item.accepted` MUST name the submitted `revision` and requires at least `requiredReviews` attestations for it.
+- An identity that attested the accepted revision MUST NOT author `work_item.payout_authorized` for that WorkItem (§4.8: the same review result cannot authorize its own payout).
+
+## 14.4 Bootstrap mode
+
+A Space without any policy object is bootstrapping. The WorkItem owner holds the funding, assignment, acceptance and payout roles; `work_item.funded` MUST NOT cite a policy version; `requiredReviews` is 1; and any identity other than the requester, funder and assignee may act as reviewer. Bootstrap mode exists for local development and the first self-hosted project. It does not satisfy the reviewer independence expected for real payouts, so RFC-0014 release gates MUST require a published policy.
+
+## 14.5 Roles reserved for later versions
+
+§4.8 also names WorkItem creation, settlement observation and dispute resolution, and RFC-0005 §9.7 needs a conflict resolver roster. Policy schema v1 does not define these roles. Until a later schema version defines them, settlement observation follows RFC-0008, disputes follow RFC-0013, and modules MUST NOT authorize conflict resolutions (they fail closed).
+
+Known related identities and declared conflicts beyond the requester, funder and assignee are not yet expressible in v1; adding them is required before any policy claims full §4.7 independence.
+
+## 14.6 Project integration configuration
+
+Integration settings that are not protocol authority stay in a project-local configuration file. A future `.alkaest/project.yaml` draft is expected to hold:
+
+* project identity and the project Space id
 * repository references
-* validator policy
-* maintainer identities
-* funding policy
 * issue eligibility rules
-* evidence requirements
+* evidence requirements and integration adapters
 
-That file format is not finalized here, but this RFC establishes the need for it.
+The file MUST NOT grant protocol authority; authorities come only from the signed Space policy.
 
 ---
 

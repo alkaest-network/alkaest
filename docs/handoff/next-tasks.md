@@ -29,7 +29,7 @@ This list is ordered by dependency. Do not start token issuance, reputation-weig
 9. Cross-review Draft RFC-0013 against RFC-0003/RFC-0005/RFC-0006/RFC-0008/RFC-0014; decide validator classes, conflict appeals, provisional/final states, and case deadlines without treating pseudonymous identities as proof of unique people.
 10. Cross-review Draft RFC-0008 and RFC-0013 together; resolve the script/key, mediator, refund, recipient-control, chain-verification, and confirmation policy gates before regtest integration.
 11. Complete RFC-0014 policy/event schemas, integer units, provider attestations, key separation, independent verification, pause/recovery, and adversarial regtest scenarios.
-12. Define Alkaest donation allocation, reserve/operating limits, guardian quorum, reviewer classes, and `.alkaest/project.yaml`.
+12. Define Alkaest donation allocation, reserve/operating limits, guardian quorum, reviewer classes beyond the RFC-0003 §14 policy schema v1 (related identities, declared conflicts), and `.alkaest/project.yaml`.
 
 ## P2 — Token decision package (design only)
 
