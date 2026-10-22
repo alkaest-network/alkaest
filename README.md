@@ -2,7 +2,7 @@
 
 Alkaest is a decentralized protocol for coordinating work through verifiable reputation, cryptographic identities, and local user-run nodes.
 
-[Contribute to Alkaest](contribute.html) · [Contribution guidelines](CONTRIBUTING.md) · [Open issues](https://github.com/alkaest-network/alkaest/issues)
+[Contribute to Alkaest](https://alkaest-network.org/contribute/) · [Contribution guidelines](CONTRIBUTING.md) · [Open issues](https://github.com/alkaest-network/alkaest/issues)
 
 [Documentation index](docs/README.md) · [Roadmap and launch gates](docs/overview/roadmap.md) · [Current state](docs/handoff/current-state.md)
 
