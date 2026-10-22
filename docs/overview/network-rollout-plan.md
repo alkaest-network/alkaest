@@ -24,6 +24,8 @@ Exit: a space's state can be rebuilt from its log on a fresh machine, byte for b
 
 Exit: every node converges to the same state for the spaces it replicates; tampered or replayed envelopes are rejected everywhere; a capped "phone" node works through a relay.
 
+Status (2026-10-22): the reference node meets these exit checks in a six-container network (`deploy/phase1/` in alkaest-node): a relay Service node, three desktops, a node capped at 0.5 CPU / 256 MiB, and a phone capped at 0.25 CPU / 128 MiB that opens no port. Still open in Phase 1: bandwidth caps and packet loss, wide-area discovery, mailbox, capability advertisement and role selection.
+
 ## Phase 2 — Real devices on real networks
 
 * A home mini PC (Standard), a laptop on another network, an Android phone (Light), all behind ordinary NATs.
