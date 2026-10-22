@@ -290,9 +290,10 @@ Examples of event types:
 ```
 object.created
 object.updated
-work_item.assigned
-work_item.submitted
+work_item.assignment_proposed
+work_item.assignment_accepted
 work_item.started
+work_item.submitted
 ```
 
 Events provide a verifiable history of actions.
@@ -596,7 +597,8 @@ Example mapping:
 
 ```
 Object type : work_item
-Event       : work_item.assigned
+Event       : work_item.assignment_proposed
+Event       : work_item.assignment_accepted
 Event       : work_item.submitted
 Decision    : work_item.accepted
 Decision    : work_item.rejected
